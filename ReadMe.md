@@ -1,8 +1,205 @@
 # Một số package hay dùng
 
-1. config: cấu hình
+Module này tổng hợp nhiều package hữu dụng, sử dụng cùng với Iris framework để tạo ra một ứng dụng hoàn chỉnh
+1. config: cấu hình, sử dụng [Viper config](https://github.com/spf13/viper)
 2. template: chuyên xử lý template engine
-3. session: quản lý session
-4. resto: thư viện rest client hỗ trợ retry
+3. session: quản lý session, kết nối vào redis. Phụ thuộc vào [iris session](https://github.com/kataras/iris/blob/master/sessions/sessions.go)
+4. resto: thư viện rest client hỗ trợ retry, sử dụng [go-retryablehttp](https://github.com/hashicorp/go-retryablehttp)
 5. rbac: phân quyền Role Based Access Control
-6. pmodel: định nghia 
+6. pmodel: định nghĩa cấu trúc dữ liệu dùng chung giữa package rbac, session
+
+![](doc/diagram.jpg)
+
+## 1. Hướng dẫn cài đặt module core
+```
+go get -u github.com/TechMaster/core@main
+```
+
+Chú ý do module core luôn đi cùng với module iris, viper do đó bạn cần bổ xung
+```
+go get -u github.com/kataras/iris/v12@master
+```
+
+## 2. Ví dụ hàm main.go sử dụng module core
+```go
+package main
+
+import (
+	"video/router"
+
+	"github.com/TechMaster/core/config"
+	"github.com/TechMaster/core/rbac"
+	"github.com/TechMaster/core/session"
+	"github.com/TechMaster/core/template"
+	"github.com/TechMaster/logger"
+	"github.com/kataras/iris/v12"
+	"github.com/spf13/viper"
+)
+
+func main() {
+	app := iris.New()
+	config.ReadConfig()
+
+	logFile := logger.Init() //Cần phải có 2 file error.html và info.html ở /views
+	if logFile != nil {
+		defer logFile.Close()
+	}
+
+	redisDb := session.InitSession()
+	defer redisDb.Close()
+	app.Use(session.Sess.Handler())
+
+	rbacConfig := rbac.NewConfig()
+	rbacConfig.RootAllow = false  //cấm không dùng tài khoản root
+	rbacConfig.MakeUnassignedRoutePublic = true //mọi route không dùng rbac coi là public
+	rbac.Init(rbacConfig) //Khởi động với cấu hình mặc định
+
+	//đặt hàm này trên các hàm đăng ký route - controller
+	app.Use(rbac.CheckRoutePermission)
+
+	app.HandleDir("/", iris.Dir("./static"))  //phục vụ thư mục file tĩnh
+
+	router.RegisterRoute(app)  //Cấu hình đường dẫn đến các controller
+
+	template.InitViewEngine(app) //Khởi tạo View Template Engine
+
+	//Luôn để hàm này sau tất cả lệnh cấu hình đường dẫn với RBAC
+	rbac.BuildPublicRoute(app)
+	//rbac.DebugRouteRole()
+	_ = app.Listen(viper.GetString("port"))
+}
+```
+
+## 3. Sử dụng config
+
+Cần đảm bảo phải có 2 file `config.dev.json` và `config.product.json` ở thư mục gốc của dự án
+```
+.
+├── config.dev.json
+├── config.product.json
+```
+
+Để đọc giá trị cấu hình dùng lệnh `viper.GetString("key")` hoặc `viper.GetInt("key")`
+```go
+_ = app.Listen(viper.GetString("port"))
+```
+
+## 4. Sử dụng RBAC
+Cần khởi tạo và cấu hình RBAC trong file main.go
+Sau đó trong router viết hàm đăng ký route + controller
+
+RBAC hỗ trợ 4 hàm:
+1. `Allow(rbac.RoleX, rbac.RoleY)`: cho phép RoleX và RoleY
+2. `AllowAll()`: cho phép tất cả các role
+3. `Forbid(rbac.RoleA, rbac.RoleB)`: cấm role RoleA, RoleB, các role khác đều được phép
+4. `ForbidAll()`: cấm tất cả các role
+
+Có thể chuyển app và hoặc đối tượng party vào tham số đầu tiên của rbac
+
+```go
+func RegisterRoute(app *iris.Application) {
+
+	app.Get("/", controller.ShowHomePage) //Không dùng rbac có nghĩa là public method
+	app.Post("/login", controller.Login)
+	rbac.Get(app, "/logout", rbac.AllowAll(), controller.LogoutFromWeb)
+
+	blog := app.Party("/blog")
+	{
+		blog.Get("/", controller.GetAllPosts) //Không dùng rbac có nghĩa là public method
+		rbac.Get(blog, "/all", rbac.AllowAll(), controller.GetAllPosts)
+		rbac.Get(blog, "/create", rbac.Forbid(rbac.MAINTAINER, rbac.SYSOP), controller.GetAllPosts)
+		rbac.Get(blog, "/{id:int}", rbac.Allow(rbac.AUTHOR, rbac.EDITOR), controller.GetPostByID)
+		rbac.Get(blog, "/delete/{id:int}", rbac.Allow(rbac.ADMIN, rbac.AUTHOR, rbac.EDITOR), controller.DeletePostByID)
+		rbac.Any(blog, "/any", rbac.Allow(rbac.SYSOP), controller.PostMiddleware)
+	}
+
+	student := app.Party("/student")
+	{
+		rbac.Get(student, "/submithomework", rbac.Allow(rbac.STUDENT), controller.SubmitHomework)
+	}
+
+	trainer := app.Party("/trainer")
+	{
+		rbac.Get(trainer, "/createlesson", rbac.Allow(rbac.TRAINER), controller.CreateLesson)
+	}
+
+	sysop := app.Party("/sysop")
+	{
+		rbac.Get(sysop, "/backupdb", rbac.Allow(rbac.SYSOP), controller.BackupDB)
+		rbac.Get(sysop, "/upload", rbac.Allow(rbac.MAINTAINER, rbac.SYSOP), controller.ShowUploadForm)
+		rbac.Post(sysop, "/upload", rbac.Allow(rbac.MAINTAINER, rbac.SYSOP, rbac.SALE), iris.LimitRequestBodySize(300000), controller.UploadPhoto)
+	}
+}
+```
+
+## 5. Cấu trúc dữ liệu trong pmodel
+
+pmodel là nơi định nghĩa cấu trúc dữ liệu phụ vụ việc đăng nhập, quản lý người dùng
+
+Danh sách các Role cấp cho một user
+```go
+type Roles map[int]interface{}
+```
+
+Thông tin tài khoản tối giản của người dùng
+```go
+//Thông tin tài khoản
+type User struct {
+	User  string
+	Pass  string
+	Email string
+	Roles Roles
+}
+```
+
+Struct sẽ lưu trong session để hệ thống quản lý phiên đăng nhập của người dùng
+```go
+type AuthenInfo struct {
+	User  string
+	Email string
+	Roles Roles //kiểu map[int]bool
+}
+```
+
+Chú ý kiểu `map[int]bool` khi lưu vào Redis sẽ biến thành `map[string]bool`
+
+## 6. Template Engine
+Hiện chưa viết được nhiều hàm phụ trợ. Sau sẽ bổ xung thêm.
+Chủ yếu sử dụng Blocks template của iris. Nếu thư viện này có lỗi sẽ clone và tạo thư viện mới.
+```go
+package template
+
+import (
+	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/view"
+)
+
+var ViewEngine *view.BlocksEngine
+
+func InitViewEngine(app *iris.Application) {
+	ViewEngine = iris.Blocks("./views", ".html")
+	app.RegisterView(ViewEngine)
+}
+```
+## 7. Resto thư viện REST client dựa trên cơ chế retry
+```go
+response, err := resto.Retry(numberOfTimesToTry, numberOfMilliSecondsToWait).Post(url, jsondata)
+response, err := resto.Retry(numberOfTimesToTry, numberOfMilliSecondsToWait).Get(url)
+```
+
+Ví dụ chi tiết
+```go
+response, err := resto.Retry(5, 1000).Post("http://auth/api/login", loginReq)
+if err != nil {
+  logger.Log(ctx, eris.NewFromMsg(err, "Lỗi khi gọi Auth service").InternalServerError())
+  return
+}
+if response.StatusCode != iris.StatusOK {
+  var res struct {
+    Error string `json:"error"`
+  }
+  _ = json.NewDecoder(response.Body).Decode(&res)
+  logger.Log(ctx, eris.Warning(res.Error).UnAuthorized())
+  return
+}
+```
