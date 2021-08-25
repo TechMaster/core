@@ -7,6 +7,8 @@ Module này tổng hợp nhiều package hữu dụng, sử dụng cùng với I
 4. resto: thư viện rest client hỗ trợ retry, sử dụng [go-retryablehttp](https://github.com/hashicorp/go-retryablehttp)
 5. rbac: phân quyền Role Based Access Control
 6. pmodel: định nghĩa cấu trúc dữ liệu dùng chung giữa package rbac, session
+7. db: kết nối CSDL Postgresql
+8. email: gửi email theo nhiều cách khác nhau
 
 ![](doc/diagram.jpg)
 
@@ -84,6 +86,22 @@ Cần đảm bảo phải có 2 file `config.dev.json` và `config.product.json`
 _ = app.Listen(viper.GetString("port"))
 ```
 
+Tham khảo file cấu hình [config.dev.json](config.dev.json)
+
+package config có hàm này để cho biết ứng dụng đang chạy mode Debug hay Production từ đó nạp file cấu hình cho phù hợp
+```go
+/*
+Trả về true nếu ứng dụng đang chạy ở chế độ Debug và ngược lại
+*/
+func IsAppInDebugMode() bool {
+	appCommand := os.Args[0]
+	if strings.Contains(appCommand, "debug") || strings.Contains(appCommand, "exe") {
+		return true
+	}
+	return false
+}
+```
+
 ## 4. Sử dụng RBAC
 Cần khởi tạo và cấu hình RBAC trong file main.go
 Sau đó trong router viết hàm đăng ký route + controller
@@ -107,10 +125,10 @@ func RegisterRoute(app *iris.Application) {
 	{
 		blog.Get("/", controller.GetAllPosts) //Không dùng rbac có nghĩa là public method
 		rbac.Get(blog, "/all", rbac.AllowAll(), controller.GetAllPosts)
-		rbac.Get(blog, "/create", rbac.Forbid(rbac.MAINTAINER, rbac.SYSOP), controller.GetAllPosts)
+		rbac.Get(blog, "/create", rbac.Forbid(rbac.MAINTAINER), controller.GetAllPosts)
 		rbac.Get(blog, "/{id:int}", rbac.Allow(rbac.AUTHOR, rbac.EDITOR), controller.GetPostByID)
 		rbac.Get(blog, "/delete/{id:int}", rbac.Allow(rbac.ADMIN, rbac.AUTHOR, rbac.EDITOR), controller.DeletePostByID)
-		rbac.Any(blog, "/any", rbac.Allow(rbac.SYSOP), controller.PostMiddleware)
+		rbac.Any(blog, "/any", rbac.Allow(rbac.MAINTAINER), controller.PostMiddleware)
 	}
 
 	student := app.Party("/student")
@@ -131,7 +149,21 @@ func RegisterRoute(app *iris.Application) {
 	}
 }
 ```
+Mặc định đã có sẵn các role sau đây
 
+```go
+const (
+	ROOT       = 0 //Role đặc biệt, vượt qua mọi logic kiểm tra quyền khi config.RootAllow = true.
+	ADMIN      = 1
+	STUDENT    = 2
+	TRAINER    = 3
+	SALE       = 4
+	EMPLOYER   = 5
+	AUTHOR     = 6
+	EDITOR     = 7 //edit bài, soạn page, làm công việc digital marketing
+	MAINTAINER = 8 //quản trị hệ thống, gánh bớt việc cho Admin, back up dữ liệu. Sửa đổi profile,role user, ngoại trừ role ROOT và Admin
+)
+```
 ## 5. Cấu trúc dữ liệu trong pmodel
 
 pmodel là nơi định nghĩa cấu trúc dữ liệu phụ vụ việc đăng nhập, quản lý người dùng
@@ -208,6 +240,18 @@ if response.StatusCode != iris.StatusOK {
 ```go
 db.ConnectPostgresqlDB(config.Config) //Kết nối vào  CSDL
 defer db.DB.Close()
+```
+
+Cấu hình kết nối CSDL để ở trong file `config.dev.json` và `config.product.json`
+```json
+{
+	"database": {
+			"user": "postgres",
+			"password": "123",
+			"database": "iris",
+			"address": "localhost:5432"
+	},
+}
 ```
 
 ## 9. email
