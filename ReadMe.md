@@ -203,3 +203,37 @@ if response.StatusCode != iris.StatusOK {
   return
 }
 ```
+
+## 8. db kết nối CSDL Postgresql
+```go
+db.ConnectPostgresqlDB(config.Config) //Kết nối vào  CSDL
+defer db.DB.Close()
+```
+
+## 9. email
+
+Đầu tiên là interface gửi email trong [mail_sender.go](email/mail_sender.go)
+```go
+type MailSender interface {
+	SendPlainEmail(to []string, subject string, body string) error
+	SendHTMLEmail(to []string, subject string, tmplFile string, data map[string]interface{}) error
+}
+```
+
+[gmail_smtp.go](email/gmail_smtp.go) gửi email sử dụng một tài khoản Gmail phải bật chế độ không an toàn mới gửi được. Còn cấu hình bằng OAuth2 Gmail Service thì quá khó. Tôi bó tay.
+
+[fake_gmail.go](email/fake_gmail.go) cũng gửi đi từ một tài khoản Gmail, nhưng địa chỉ thư nhận luôn là một hòm thư cấu hình sẵn dùng để kiểm tra, debug ứng dụng.
+
+[email_db.go](email/email_db.go) thay vì gửi email thì tạo một records trong bảng `debug.emailstore` CSDL Postgresql. Cấu trúc bảng như dưới.
+
+```go
+type EmailStore struct {
+	tableName  struct{} `pg:"debug.emailstore"`
+	Id         int      `pg:",pk"`
+	Receipient string
+	Subject    string
+	Body       string
+	CreatedAt  time.Time
+}
+```
+Trong tương lai tôi sẽ bổ xung thêm vài biến thể gửi mail tuân thủ `type MailSender interface`
