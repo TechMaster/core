@@ -21,7 +21,9 @@ Lưu thông tin về người đăng nhập sau khi đăng nhập thành công.
 Cấu trúc này sẽ lưu vào session
 */
 type AuthenInfo struct {
-	User  string
-	Email string
-	Roles Roles //kiểu map[int]bool
+	Id       string //unique id của user
+	FullName string //họ và tên đầy đủ của user
+	Email    string //email cũng phải unique
+	Avatar   string //unique id hoặc tên file ảnh đại diện
+	Roles    Roles  //kiểu map[int]bool
 }

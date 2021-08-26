@@ -47,7 +47,7 @@ func main() {
 		defer logFile.Close()
 	}
 
-	redisDb := session.InitSession()
+	redisDb := session.InitRedisSession()
 	defer redisDb.Close()
 	app.Use(session.Sess.Handler())
 
@@ -102,7 +102,25 @@ func IsAppInDebugMode() bool {
 }
 ```
 
-## 4. Sử dụng RBAC
+## 4. Sử dụng Session
+### 4.1 Chạy ứng dụng đơn lẻ độc lập
+Nếu bạn viết ứng dụng đơn lẻ thì có thể lưu trực tiếp session vào vùng nhớ của ứng dụng web. Khi này bạn không cần dùng Redis hay bất kỳ CSDL.
+
+Hàm khởi tạo Session trong file main.go sẽ như sau
+```go
+session.InitSession()
+app.Use(session.Sess.Handler())
+```
+### 4.2 Nhiều ứng dụng dùng chung session database
+Khi có nhiều ứng dụng web, microservice dùng chung một domain nhưng định địa chỉ bằng các sub domain khác nhau, để có được chức năng Single Sign On (đăng nhập một lần, nhưng truy cập được nhiều site cùng chung domain), chúng ta buộc phải lưu session ra database chung ví dụ như Redis.
+
+```go
+redisDb := session.InitRedisSession()
+defer redisDb.Close()
+app.Use(session.Sess.Handler())
+```
+
+## 5. Sử dụng RBAC
 Cần khởi tạo và cấu hình RBAC trong file main.go
 Sau đó trong router viết hàm đăng ký route + controller
 
@@ -164,7 +182,7 @@ const (
 	MAINTAINER = 8 //quản trị hệ thống, gánh bớt việc cho Admin, back up dữ liệu. Sửa đổi profile,role user, ngoại trừ role ROOT và Admin
 )
 ```
-## 5. Cấu trúc dữ liệu trong pmodel
+## 6. Cấu trúc dữ liệu trong pmodel
 
 pmodel là nơi định nghĩa cấu trúc dữ liệu phụ vụ việc đăng nhập, quản lý người dùng
 
@@ -195,9 +213,14 @@ type AuthenInfo struct {
 
 Chú ý kiểu `map[int]bool` khi lưu vào Redis sẽ biến thành `map[string]bool`
 
-## 6. Template Engine
+## 7. Template Engine
 Hiện chưa viết được nhiều hàm phụ trợ. Sau sẽ bổ xung thêm.
 Chủ yếu sử dụng Blocks template của iris. Nếu thư viện này có lỗi sẽ clone và tạo thư viện mới.
+Chú ý để dùng được `*view.BlocksEngine` bạn phải lấy bản mới nhất thư viện Iris
+```
+go get -u github.com/kataras/iris/v12@master
+```
+[template/base.go](template/base.go)
 ```go
 package template
 
@@ -213,7 +236,7 @@ func InitViewEngine(app *iris.Application) {
 	app.RegisterView(ViewEngine)
 }
 ```
-## 7. Resto thư viện REST client dựa trên cơ chế retry
+## 8. Resto thư viện REST client dựa trên cơ chế retry
 ```go
 response, err := resto.Retry(numberOfTimesToTry, numberOfMilliSecondsToWait).Post(url, jsondata)
 response, err := resto.Retry(numberOfTimesToTry, numberOfMilliSecondsToWait).Get(url)
@@ -236,7 +259,7 @@ if response.StatusCode != iris.StatusOK {
 }
 ```
 
-## 8. db kết nối CSDL Postgresql
+## 9. db kết nối CSDL Postgresql
 ```go
 db.ConnectPostgresqlDB(config.Config) //Kết nối vào  CSDL
 defer db.DB.Close()
@@ -254,7 +277,7 @@ Cấu hình kết nối CSDL để ở trong file `config.dev.json` và `config.
 }
 ```
 
-## 9. email
+## 10. email
 
 Đầu tiên là interface gửi email trong [mail_sender.go](email/mail_sender.go)
 ```go
@@ -266,7 +289,10 @@ type MailSender interface {
 
 [gmail_smtp.go](email/gmail_smtp.go) gửi email sử dụng một tài khoản Gmail phải bật chế độ không an toàn mới gửi được. Còn cấu hình bằng OAuth2 Gmail Service thì quá khó. Tôi bó tay.
 
-[fake_gmail.go](email/fake_gmail.go) cũng gửi đi từ một tài khoản Gmail, nhưng địa chỉ thư nhận luôn là một hòm thư cấu hình sẵn dùng để kiểm tra, debug ứng dụng.
+[fake_gmail.go](email/fake_gmail.go) cũng gửi đi từ một tài khoản Gmail, nhưng địa chỉ thư nhận luôn là một hòm thư cấu hình sẵn `test_receive_email string` dùng để kiểm tra, debug ứng dụng.
+```go
+func InitFakeGmail(config *SMTPConfig, test_receive_email string)
+```
 
 [email_db.go](email/email_db.go) thay vì gửi email thì tạo một records trong bảng `debug.emailstore` CSDL Postgresql. Cấu trúc bảng như dưới.
 

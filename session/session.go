@@ -18,13 +18,25 @@ const (
 /*
 Cấu hình Session Manager
 */
-var Sess = sessions.New(sessions.Config{
-	Cookie:       SESSION_COOKIE,
-	AllowReclaim: true,
-	Expires:      time.Hour * 48, /*Có giá trị trong 2 ngày*/
-})
+var Sess *sessions.Sessions
 
-func InitSession() *redis.Database {
+/* Khởi tạo In Memory Session, không kết nối vào Redis hay bất kỳ CSDL nào
+Dùng trong ứng dụng đơn lẻ
+*/
+func InitSession() {
+	Sess = sessions.New(sessions.Config{
+		Cookie:       SESSION_COOKIE,
+		AllowReclaim: true,
+		Expires:      time.Hour * 48, /*Có giá trị trong 2 ngày*/
+	})
+}
+
+/*
+Khi có nhiều web site dùng chung Session, cần lưu Session vào Redis database
+Hàm này thay thế cho InitSession() vì có thể trong tương lai có thêm lựa chọn
+lưu session vào MySQL, MongoDB hoặc Postgresql
+*/
+func InitRedisSession() *redis.Database {
 
 	redisDB := redis.New(redis.Config{
 		Network:   viper.GetString("redis.network"),
