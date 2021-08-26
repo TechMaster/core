@@ -341,8 +341,8 @@ func CheckPassword(inputpass string, hashedpass string, salt string) bool {
 Thay v0.1.3 bằng phiên bản thực tế
 ```
 git add .
-git commit -m "v0.1.3"
-git tag v0.1.3
-git push origin v0.1.3
-GOPROXY=proxy.golang.org go list -m github.com/TechMaster/core@v0.1.3
+git commit -m "v0.1.10"
+git tag v0.1.10
+git push origin v0.1.10
+GOPROXY=proxy.golang.org go list -m github.com/TechMaster/core@v0.1.10
 ```
