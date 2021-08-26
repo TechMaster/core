@@ -191,23 +191,29 @@ Danh sách các Role cấp cho một user
 type Roles map[int]interface{}
 ```
 
-Thông tin tài khoản tối giản của người dùng
+Thông tin tài khoản tối giản của người dùng.
+Chú ý có thêm trường `Attrs    map[string]string` để lưu các thông 
 ```go
-//Thông tin tài khoản
 type User struct {
-	User  string
-	Pass  string
-	Email string
-	Roles Roles
+	Id       string            //unique id của user
+	Password string            //password đã được băm
+	FullName string            //họ và tên đầy đủ của user
+	Email    string            //email cũng phải unique
+	Phone 	 string            //số di động của user
+	Avatar   string            //unique id hoặc tên file ảnh đại diện
+	Roles    Roles             //kiểu map[int]bool
+	Attrs    map[string]string `pg:",hstore"`  //sử dụng kiểu store để lưu dữ liệu kiểu map[string]string
 }
 ```
 
 Struct sẽ lưu trong session để hệ thống quản lý phiên đăng nhập của người dùng
 ```go
 type AuthenInfo struct {
-	User  string
-	Email string
-	Roles Roles //kiểu map[int]bool
+	Id       string //unique id của user
+	FullName string //họ và tên đầy đủ của user
+	Email    string //email cũng phải unique
+	Avatar   string //unique id hoặc tên file ảnh đại diện
+	Roles    Roles  //kiểu map[int]bool
 }
 ```
 
@@ -307,3 +313,13 @@ type EmailStore struct {
 }
 ```
 Trong tương lai tôi sẽ bổ xung thêm vài biến thể gửi mail tuân thủ `type MailSender interface`
+
+## Để phát hành phiên bản mới module này cần làm những bước sau
+Thay v0.1.3 bằng phiên bản thực tế
+```
+git add .
+git commit -m "v0.1.3"
+git tag v0.1.3
+git push origin v0.1.3
+GOPROXY=proxy.golang.org go list -m github.com/TechMaster/core@v0.1.3
+```

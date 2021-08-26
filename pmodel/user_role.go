@@ -10,14 +10,19 @@ type Roles map[int]interface{}
 
 //Thông tin tài khoản
 type User struct {
-	User  string
-	Pass  string
-	Email string
-	Roles Roles
+	Id       string            //unique id của user
+	Password string            //password đã được băm
+	FullName string            //họ và tên đầy đủ của user
+	Email    string            //email cũng phải unique
+	Phone    string            //số di động của user
+	Avatar   string            //unique id hoặc tên file ảnh đại diện
+	Roles    Roles             //kiểu map[int]bool
+	Attrs    map[string]string `pg:",hstore"` //sử dụng kiểu store để lưu dữ liệu kiểu map[string]string
 }
 
 /*
 Lưu thông tin về người đăng nhập sau khi đăng nhập thành công.
+Giống hệt User nhưng loại bỏ trường HashPass
 Cấu trúc này sẽ lưu vào session
 */
 type AuthenInfo struct {
