@@ -314,6 +314,35 @@ type EmailStore struct {
 ```
 Trong tương lai tôi sẽ bổ xung thêm vài biến thể gửi mail tuân thủ `type MailSender interface`
 
+## 11. pass các hàm băm password
+Tuyệt đối không được lưu secret key hay các chuỗi nhạy cảm vào đây. Xem chi tiết [pass/password.go](pass/password.go)
+
+Băm password bằng thư viện Bcrypt
+```go
+func HashBcryptPass(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+```
+
+Kiểm tra password
+```go
+/*
+Hàm check password hỗ trợ cả kiểu SHA1 cũ và bcrypt mới
+- inputpass: password nhập vào lúc login
+- hashedpass: password đã băm đọc từ CSDL
+- salt: chuỗi nhiễu tạo ra từ thuật toán SHA1 cũ
+*/
+func CheckPassword(inputpass string, hashedpass string, salt string) bool {
+	if salt != "" {
+		pass := p.NewPassword(sha1.New, 50, 64, 10000)
+		return pass.VerifyPassword(inputpass, hashedpass, hashedpass)
+	} else {
+		err := bcrypt.CompareHashAndPassword([]byte(hashedpass), []byte(inputpass))
+		return err == nil
+	}
+}
+```
 ## Để phát hành phiên bản mới module này cần làm những bước sau
 Thay v0.1.3 bằng phiên bản thực tế
 ```
