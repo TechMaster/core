@@ -28,3 +28,16 @@ type User struct {
 	UserStatus          bool      `sql:"default:true"` // True là active, False là unactive, mặc định là True
 	Salt                string    // Dùng để kiểm tra hash password. Khi dùng BCrypt không cần nữa
 }
+
+/*
+Lưu thông tin về người đăng nhập sau khi đăng nhập thành công.
+Giống hệt User nhưng loại bỏ trường HashPass
+Cấu trúc này sẽ lưu vào session
+*/
+type AuthenInfo struct {
+	Id       string //unique id của user
+	FullName string //họ và tên đầy đủ của user
+	Email    string //email cũng phải unique
+	Avatar   string //unique id hoặc tên file ảnh đại diện
+	Roles    Roles  //kiểu map[int]bool. Cần phải chuyển đổi Roles []int32 `pg:",array"` sang
+}
