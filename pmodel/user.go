@@ -15,7 +15,7 @@ type User struct {
 	BankName            string   // Tên ngân hàng
 	BankAccount         string   // Số tài khoản ngân hàng
 	Slug                string
-	Roles               []int32   `pg:",array"`
+	Roles               []int     `pg:",array"`
 	AccessFailedCount   int32     `sql:"default:0"`                            // Số lần đăng nhập sai, mặc định là 0
 	EmailConfirmed      bool      `json:"email_confirmed" sql:"default:false"` // Email đã xác nhận (kích hoạt) hay chưa
 	VerifyEmailToken    string    `json:"verify_email_token"`                  // Token để xác thực Email
