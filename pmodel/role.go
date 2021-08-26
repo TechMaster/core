@@ -23,7 +23,7 @@ Chuyển đổi kiểu intArray trong đó mỗi phần tử ứng với một r
 */
 func IntArrToRoles(intArr []int) Roles {
 	roles := make(Roles)
-	for role := range intArr {
+	for _, role := range intArr {
 		roles[role] = true
 	}
 	return roles
