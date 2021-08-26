@@ -108,7 +108,6 @@ Nếu bạn viết ứng dụng đơn lẻ thì có thể lưu trực tiếp ses
 
 Hàm khởi tạo Session trong file main.go sẽ như sau
 ```go
-session.InitSession()
 app.Use(session.Sess.Handler())
 ```
 ### 4.2 Nhiều ứng dụng dùng chung session database
@@ -186,26 +185,12 @@ const (
 
 pmodel là nơi định nghĩa cấu trúc dữ liệu phụ vụ việc đăng nhập, quản lý người dùng
 
+Cấu trúc chi tiết User xem ở đây [pmodel/user.go](pmodel/user.go)
+
 Danh sách các Role cấp cho một user
 ```go
 type Roles map[int]interface{}
 ```
-
-Thông tin tài khoản tối giản của người dùng.
-Chú ý có thêm trường `Attrs    map[string]string` để lưu các thông 
-```go
-type User struct {
-	Id       string            //unique id của user
-	Password string            //password đã được băm
-	FullName string            //họ và tên đầy đủ của user
-	Email    string            //email cũng phải unique
-	Phone 	 string            //số di động của user
-	Avatar   string            //unique id hoặc tên file ảnh đại diện
-	Roles    Roles             //kiểu map[int]bool
-	Attrs    map[string]string `pg:",hstore"`  //sử dụng kiểu store để lưu dữ liệu kiểu map[string]string
-}
-```
-
 Struct sẽ lưu trong session để hệ thống quản lý phiên đăng nhập của người dùng
 ```go
 type AuthenInfo struct {
@@ -213,11 +198,20 @@ type AuthenInfo struct {
 	FullName string //họ và tên đầy đủ của user
 	Email    string //email cũng phải unique
 	Avatar   string //unique id hoặc tên file ảnh đại diện
-	Roles    Roles  //kiểu map[int]bool
+	Roles    Roles  //kiểu map[int]bool. Cần phải chuyển đổi Roles []int32 `pg:",array"` sang
 }
 ```
 
 Chú ý kiểu `map[int]bool` khi lưu vào Redis sẽ biến thành `map[string]bool`
+Chuyển đổi Roles kiểu map[int] bool sang mảng []int để lưu xuống CSDL
+```go
+func RolesToIntArr(roles Roles) []int
+```
+
+Chuyển đổi kiểu intArray trong đó mỗi phần tử ứng với một role, sang kiểu map[int] bool
+```go
+func IntArrToRoles(intArr []int) Roles
+```
 
 ## 7. Template Engine
 Hiện chưa viết được nhiều hàm phụ trợ. Sau sẽ bổ xung thêm.

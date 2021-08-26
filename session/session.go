@@ -23,7 +23,7 @@ var Sess *sessions.Sessions
 /* Khởi tạo In Memory Session, không kết nối vào Redis hay bất kỳ CSDL nào
 Dùng trong ứng dụng đơn lẻ
 */
-func InitSession() {
+func init() {
 	Sess = sessions.New(sessions.Config{
 		Cookie:       SESSION_COOKIE,
 		AllowReclaim: true,
@@ -37,7 +37,6 @@ Hàm này thay thế cho InitSession() vì có thể trong tương lai có thêm
 lưu session vào MySQL, MongoDB hoặc Postgresql
 */
 func InitRedisSession() *redis.Database {
-
 	redisDB := redis.New(redis.Config{
 		Network:   viper.GetString("redis.network"),
 		Addr:      viper.GetString("redis.addr"),
