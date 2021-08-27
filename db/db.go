@@ -7,12 +7,11 @@ import (
 
 var DB *pg.DB
 
-func ConnectPostgresqlDB() *pg.DB {
+func ConnectPostgresqlDB(){
 	DB = pg.Connect(&pg.Options{
 		User:     viper.GetString("database.user"),
 		Password: viper.GetString("database.password"),
 		Database: viper.GetString("database.database"),
 		Addr:     viper.GetString("database.address"),
 	})
-	return DB
 }
