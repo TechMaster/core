@@ -1,5 +1,8 @@
 # Một số package hay dùng
 
+[**Hãy đọc kỹ những thay đổi theo phiên bản**](doc/change.md)
+
+
 Module này tổng hợp nhiều package hữu dụng, sử dụng cùng với Iris framework để tạo ra một ứng dụng hoàn chỉnh
 1. config: cấu hình, sử dụng [Viper config](https://github.com/spf13/viper)
 2. template: chuyên xử lý template engine
@@ -73,7 +76,6 @@ func main() {
 	app.Use(session.Sess.Handler())
 
 	rbacConfig := rbac.NewConfig()
-	rbacConfig.RootAllow = false  //cấm không dùng tài khoản root
 	rbacConfig.MakeUnassignedRoutePublic = true //mọi route không dùng rbac coi là public
 	rbac.Init(rbacConfig) //Khởi động với cấu hình mặc định
 
@@ -148,7 +150,13 @@ defer redisDb.Close()
 app.Use(session.Sess.Handler())
 ```
 
-### 5.3 Chức năng cập nhật role chỉ dành cho Admin
+### 5.3 Khi logout bắt buộc phải dùng hàm session.Logout
+Hàm này thực hiện việc xoá session id và phần tử session trong tập user.Id. Nó có tác dụng loại bỏ bớt rác trong redis database.
+```go
+func Logout(ctx iris.Context) error
+```
+
+### 5.4 Chức năng cập nhật role chỉ dành cho Admin
 Khi Admin thay đổi role người dùng. Người này không cần logout mà role có tác dụng ngay, trên mọi thiết bị anh ta đang đăng nhập.
 
 ```go
@@ -220,7 +228,6 @@ Mặc định đã có sẵn các role sau đây
 
 ```go
 const (
-	ROOT       = 0 //Role đặc biệt, vượt qua mọi logic kiểm tra quyền khi config.RootAllow = true.
 	ADMIN      = 1
 	STUDENT    = 2
 	TRAINER    = 3
