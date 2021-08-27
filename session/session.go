@@ -20,7 +20,7 @@ const (
 var Sess *sessions.Sessions         //Cấu hình Session Manager
 var redisDB *redis_session.Database //Đây là một wrapper nối xuống Redis của Iris
 var redisClient *redis.Client       //Đây là redis client trực tiếp nối xuống Redis db không qua Iris
-var expires = time.Hour * 3         //Thời gian mà 1 session sẽ hết hạn và bị xoá khỏi Redis
+var expires = time.Hour * 4         //Thời gian mà 1 session sẽ hết hạn và bị xoá khỏi Redis
 
 /* Khởi tạo In Memory Session, không kết nối vào Redis hay bất kỳ CSDL nào
 Dùng trong ứng dụng đơn lẻ

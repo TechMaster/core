@@ -1,8 +1,17 @@
 # Một số package hay dùng
 
 [**Hãy đọc kỹ những thay đổi theo phiên bản**](doc/change.md)
+### Lộ trình phát triển mới
+1. Bổ xung kết nối WebSocket
+2. Các hàm bổ trợ cho go-pg
+3. Thêm hàm Delete, Put cho resto
+4. Thêm hàm dùng chung cho template
+5. Thêm chức năng bổ xung REST API để các dịch vụ khác truy vấn lấy thông tin: tên dịch vụ, thời gian kể từ lúc khởi động, danh sách các route + phần quyền...
+6. Session cần kéo dài expire date khi người dùng tiếp tục truy cập
+7. Bổ xung cách khác để gửi email, gom vào một dịch vụ chuyên biệt để gửi email
+8. Chức năng chạy schedule task để dọn dẹp ví dụ dọn thư mục log, xoá bớt orphan entry trong Redis
 
-
+### Giới thiệu
 Module này tổng hợp nhiều package hữu dụng, sử dụng cùng với Iris framework để tạo ra một ứng dụng hoàn chỉnh
 1. config: cấu hình, sử dụng [Viper config](https://github.com/spf13/viper)
 2. template: chuyên xử lý template engine
@@ -36,7 +45,7 @@ go mod tidy
 
 Khởi động một redis server. Trước đó hãy tạo thư mục data để map volume
 ```
-docker run --name=redis -p 6379:6379 -d --requirepass "123" -v $PWD/data:/data redis:alpine3.14
+docker run --name=redis -p 6379:6379 -d -e REDIS_PASSWORD=123 -v $PWD/data:/data redis:alpine3.14
 ```
 
 Chạy lệnh

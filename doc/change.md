@@ -1,9 +1,4 @@
 # Những thay đổi
-
-## Sẽ làm
-1. Bổ xung chức năng kéo dài session
-
-
 ### 0.1.14
 - Sửa lỗi ở hàm `func assignRoles(method string, path string, roles pmodel.Roles)` bằng cách thay các // bằng /
 - Cập nhật lại ReadMe.md
