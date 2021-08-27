@@ -15,7 +15,6 @@ những key/value chứa thông tin người đăng nhập
 */
 func SetAuthenticated(ctx iris.Context, authenInfo pmodel.AuthenInfo) error {
 	sess := sessions.Get(ctx)
-	sess.Set(SESS_AUTH, true)
 	sess.Set(SESS_USER, authenInfo)
 
 	/* Thêm sessionID vào key userID
@@ -43,7 +42,7 @@ và cập nhật lại userID: SessionID B
 Như vậy Redis không bị rác
 */
 func Logout(ctx iris.Context) error {
-	authenInfo := GetAuthInfoViewData(ctx)
+	authenInfo := GetAuthInfo(ctx)
 	sess := sessions.Get(ctx)
 	bgCtx := context.Background()
 	sessionID := sess.ID()

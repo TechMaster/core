@@ -1,2 +1,5 @@
 .DS_Store
 logs/*.txt
+data/*.*
+*.aof
+*.rdb

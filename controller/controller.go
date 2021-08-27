@@ -3,11 +3,11 @@ package controller
 import (
 	"fmt"
 
+	"github.com/TechMaster/core/rbac"
 	"github.com/TechMaster/core/repo"
 
 	"github.com/TechMaster/core/pass"
 	"github.com/TechMaster/core/pmodel"
-	"github.com/TechMaster/core/rbac"
 	"github.com/TechMaster/core/session"
 
 	"github.com/kataras/iris/v12"
@@ -22,20 +22,16 @@ type LoginRequest struct {
 }
 
 func ShowHomePage(ctx iris.Context) {
-	if raw_authinfo := ctx.GetViewData()[session.AUTHINFO]; raw_authinfo != nil {
-		authinfo := raw_authinfo.(*pmodel.AuthenInfo)
+	authinfo := session.GetAuthInfo(ctx)
+	if authinfo != nil {
 		ctx.ViewData("roles", rbac.RolesNames(authinfo.Roles))
 	}
+
 	ctx.ViewData("users", repo.GetAll())
 	_ = ctx.View("index")
 }
 
 func ShowSecret(ctx iris.Context) {
-	// Check if user is authenticated
-	if !session.IsLogin(ctx) {
-		ctx.StatusCode(iris.StatusForbidden)
-		return
-	}
 	_, _ = ctx.WriteString("Secret Page")
 }
 
@@ -73,6 +69,6 @@ func Login(ctx iris.Context) {
 }
 
 func LogoutFromWeb(ctx iris.Context) {
-	session.Logout(ctx)
+	_ = session.Logout(ctx)
 	ctx.Redirect("/")
 }

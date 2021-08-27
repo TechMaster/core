@@ -4,39 +4,42 @@ import (
 	"github.com/TechMaster/core/pmodel"
 
 	"github.com/TechMaster/core/sessions"
-	"github.com/TechMaster/eris"
 	"github.com/kataras/iris/v12"
 	"github.com/mitchellh/mapstructure"
 )
 
-func GetAuthInfo(ctx iris.Context) (*pmodel.AuthenInfo, error) {
+/*
+Lấy thông tin đăng nhập của người dùng từ Redis Session
+*/
+func GetAuthInfoSession(ctx iris.Context) (authinfo *pmodel.AuthenInfo) {
 	data := sessions.Get(ctx).Get(SESS_USER)
 	if data == nil {
-		return nil, nil
+		return nil
 	}
 
-	authinfo := new(pmodel.AuthenInfo)
+	authinfo = new(pmodel.AuthenInfo)
 	if err := mapstructure.WeakDecode(data, authinfo); err != nil {
-		return nil, eris.NewFrom(err)
+		return nil
 	}
-	return authinfo, nil
+	return authinfo
 }
 
 /*
-Lấy AuthInfo từ trong ViewData.
-Ở Handler RBAC checkpermission trước, nếu người dùng đăng nhập
-AuthInfo đã được ghi vào ViewData[AUTHINFO]
+Lấy AuthInfo từ trong ViewData. Nếu lấy được thì trả về luôn.
+Nếu không tồn tại kiểm tra tiếp trong session. Nếu thấy trả về.
+Nếu trong ViewData và Session đều không có, có nghĩa người dùng chưa login
 */
-func GetAuthInfoViewData(ctx iris.Context) *pmodel.AuthenInfo {
+func GetAuthInfo(ctx iris.Context) (authinfo *pmodel.AuthenInfo) {
 	if raw_authinfo := ctx.GetViewData()[AUTHINFO]; raw_authinfo != nil {
-		if authinfo, ok := raw_authinfo.(*pmodel.AuthenInfo); ok {
+		var ok bool
+		if authinfo, ok = raw_authinfo.(*pmodel.AuthenInfo); ok {
 			return authinfo
 		}
 	}
-	return nil
-}
 
-func IsLogin(ctx iris.Context) bool {
-	login, _ := sessions.Get(ctx).GetBoolean(SESS_AUTH)
-	return login
+	authinfo = GetAuthInfoSession(ctx)
+	if authinfo != nil {
+		return authinfo
+	}
+	return nil
 }

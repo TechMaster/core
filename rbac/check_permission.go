@@ -12,7 +12,7 @@ import (
 //Hàm này cần được gọi trước tất cả handler do lập trình viên viết
 func CheckRoutePermission(ctx iris.Context) {
 	route := ctx.GetCurrentRoute().String() //Lấy route trong ctx
-	authinfo, _ := session.GetAuthInfo(ctx)
+	authinfo := session.GetAuthInfoSession(ctx)
 
 	//Nếu route không thuộc nhóm public routes cần kiểm tra phân quyền
 	if authinfo != nil {

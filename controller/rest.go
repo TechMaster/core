@@ -45,6 +45,6 @@ func LoginREST(ctx iris.Context) {
 }
 
 func LogoutREST(ctx iris.Context) {
-	session.Logout(ctx)
+	_ = session.Logout(ctx)
 	_, _ = ctx.JSON("Logout success")
 }

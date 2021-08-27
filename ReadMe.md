@@ -45,7 +45,7 @@ go mod tidy
 
 Khởi động một redis server. Trước đó hãy tạo thư mục data để map volume
 ```
-docker run --name=redis -p 6379:6379 -d -e REDIS_PASSWORD=123 -v $PWD/data:/data redis:alpine3.14
+docker run --name=redis -p 6379:6379 -d -e REDIS_PASSWORD=123 -v $PWD/data:/data redis:alpine3.14 /bin/sh -c 'redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}'
 ```
 
 Chạy lệnh
@@ -158,14 +158,54 @@ redisDb := session.InitRedisSession()
 defer redisDb.Close()
 app.Use(session.Sess.Handler())
 ```
+### 5.3 Làm thế nào để biết người dùng đã đăng nhập?
+package session cung cấp 2 hàm
 
-### 5.3 Khi logout bắt buộc phải dùng hàm session.Logout
+```go
+func GetAuthInfo(ctx iris.Context) (authinfo *pmodel.AuthenInfo)
+func GetAuthInfoSession(ctx iris.Context) (authinfo *pmodel.AuthenInfo)
+```
+`GetAuthInfo` đầu tiên sẽ lấy thông tin đăng nhập của người dùng từ `ViewData["authinfo"]` nếu không thấy sẽ tiếp tục gọi vào `GetAuthInfoSession` để lấy thông tin từ session.
+
+Nếu trả về `nil` có nghĩa người dùng chưa đăng nhập. Nếu khác `nil` thì cấu trúc dữ liệu trả về như sau:
+```go
+type AuthenInfo struct {
+	Id       string //unique id của user
+	FullName string //họ và tên đầy đủ của user
+	Email    string //email cũng phải unique
+	Avatar   string //unique id hoặc tên file ảnh đại diện
+	Roles    Roles  //kiểu map[int]bool. Cần phải chuyển đổi Roles []int32 `pg:",array"` sang
+}
+```
+
+Tôi đã bỏ hàm `func IsLogin(ctx iris.Context)` vì hàm này không trả về đầy đủ được thông tin. Ngược lại hàm `func GetAuthInfo` trả về được id, full name, email, avatar và danh sách roles của người dùng.
+
+Bạn cần lấy danh sách roles của người dùng mảng các chuỗi mô tả role. Hãy truyền `authinfo.Roles` vào hàm này
+```go
+rbac.RolesNames(roles pmodel.Roles)[]string
+```
+Bạn cần in ra danh sách role vừa có giá trị int và có chuỗi mô tả để debug cho thuận tiện `3:trainer, 8:maintainer`. Hãy tham khảo hàm [func GetAll](repo/repo.go)
+```go
+rolesString := ""
+for i, role := range user.Roles {
+	rolesString += fmt.Sprintf("%d:%s", role, rbac.RoleName(role))
+	if i < len(user.Roles)-1 {
+		rolesString += ", "
+	}
+}
+```
+
+Bạn có một mảng ```[]int``` thể hiện các role, cần chuyển sang kiểu `type Roles map[int]interface{}`. Hãy dùng [IntArrToRoles](pmodel/role.go)
+```go
+func IntArrToRoles(intArr []int) Roles 
+```
+### 5.4 Khi logout bắt buộc phải dùng hàm session.Logout
 Hàm này thực hiện việc xoá session id và phần tử session trong tập user.Id. Nó có tác dụng loại bỏ bớt rác trong redis database.
 ```go
 func Logout(ctx iris.Context) error
 ```
 
-### 5.4 Chức năng cập nhật role chỉ dành cho Admin
+### 5.5 Chức năng cập nhật role chỉ dành cho Admin
 Khi Admin thay đổi role người dùng. Người này không cần logout mà role có tác dụng ngay, trên mọi thiết bị anh ta đang đăng nhập.
 
 ```go
@@ -180,7 +220,7 @@ Nếu vì một nguyên nhân nào đó, thuật toán đồng bộ Role của u
 Thuật toán này chưa hoàn hảo, nó có thể để lại rác trong Redis trong một số trường hợp.
 
 Hiện nay tôi copy toàn bộ package https://github.com/kataras/iris/tree/master/sessions vào thư mục sessions. Hiện chưa sửa đổi gì. Tuy nhiên sẽ fix bug ngay nếu package này có lỗi.
-### 5.4 Chức năng Logout
+### 5.6 Chức năng Logout
 Trong framework Iris, khi người dùng logout ở một trình duyệt trên một thiết bị, không làm sao xoá được key = sessionID. Hàm này không những xoá key = sessionID mà còn sửa lại entry UserID bỏ bớt phần tử sessionID
 ```go
 func Logout(ctx iris.Context) error

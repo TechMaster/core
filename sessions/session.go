@@ -487,7 +487,7 @@ func (s *Session) GetBooleanDefault(key string, defaultValue bool) bool {
 func (s *Session) GetAll() map[string]interface{} {
 	items := make(map[string]interface{}, s.provider.db.Len(s.sid))
 	s.mu.RLock()
-	s.provider.db.Visit(s.sid, func(key string, value interface{}) {
+	_ = s.provider.db.Visit(s.sid, func(key string, value interface{}) {
 		items[key] = value
 	})
 	s.mu.RUnlock()
@@ -509,7 +509,7 @@ func (s *Session) GetFlashes() map[string]interface{} {
 
 // Visit loops each of the entries and calls the callback function func(key, value).
 func (s *Session) Visit(cb func(k string, v interface{})) {
-	s.provider.db.Visit(s.sid, cb)
+	_ = s.provider.db.Visit(s.sid, cb)
 }
 
 // Len returns the total number of stored values in this session.
@@ -518,7 +518,7 @@ func (s *Session) Len() int {
 }
 
 func (s *Session) set(key string, value interface{}, immutable bool) {
-	s.provider.db.Set(s.sid, key, value, s.Lifetime.DurationUntilExpiration(), immutable)
+	_ = s.provider.db.Set(s.sid, key, value, s.Lifetime.DurationUntilExpiration(), immutable)
 }
 
 // Set fills the session with an entry "value", based on its "key".
@@ -578,7 +578,7 @@ func (s *Session) DeleteFlash(key string) {
 
 // Clear removes all entries.
 func (s *Session) Clear() {
-	s.provider.db.Clear(s.sid)
+	_ = s.provider.db.Clear(s.sid)
 }
 
 // ClearFlashes removes all flash messages.

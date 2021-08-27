@@ -1,4 +1,12 @@
 # Những thay đổi
+### 0.1.16
+Trong package session, bỏ `func IsLogin(ctx iris.Context)`, từ nay hãy dùng 2 hàm này
+để lấy thông tin người dùng đăng nhập. Ưu tiên hàm `GetAuthInfo` hơn nhé.
+```go
+func GetAuthInfo(ctx iris.Context) (authinfo *pmodel.AuthenInfo) 
+func GetAuthInfoSession(ctx iris.Context) (authinfo *pmodel.AuthenInfo)
+```
+
 ### 0.1.14
 - Sửa lỗi ở hàm `func assignRoles(method string, path string, roles pmodel.Roles)` bằng cách thay các // bằng /
 - Cập nhật lại ReadMe.md
