@@ -1,4 +1,22 @@
 # Những thay đổi
+### 0.1.19
+Sửa lại hàm để hỗ trợ 4 hình thức
+1. Debug app
+2. Run app bằng `go run main.go`
+3. Debug test
+4. Run test
+   
+```go
+func IsAppInDebugMode() bool {
+	appCommand := os.Args[0]
+	if strings.Contains(appCommand, "debug") || //debug ứng dụng trong vscode
+		strings.Contains(appCommand, "exe") || //go run main.go
+		strings.Contains(appCommand, "go-build") { //run test
+		return true
+	}
+	return false
+}
+```
 ### 0.1.16
 Trong package session, bỏ `func IsLogin(ctx iris.Context)`, từ nay hãy dùng 2 hàm này
 để lấy thông tin người dùng đăng nhập. Ưu tiên hàm `GetAuthInfo` hơn nhé.

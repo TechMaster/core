@@ -13,7 +13,9 @@ Trả về true nếu ứng dụng đang chạy ở chế độ Debug và ngư�
 */
 func IsAppInDebugMode() bool {
 	appCommand := os.Args[0]
-	if strings.Contains(appCommand, "debug") || strings.Contains(appCommand, "exe") {
+	if strings.Contains(appCommand, "debug") || //debug ứng dụng trong vscode
+		strings.Contains(appCommand, "exe") || //go run main.go
+		strings.Contains(appCommand, "go-build") { //run test
 		return true
 	}
 	return false
