@@ -32,7 +32,7 @@ func main() {
 	app.Use(rbac.CheckRoutePermission)
 	router.RegisterRoute(app)
 
-	template.InitViewEngine(app)
+	template.InitViewEngine(app, "./view")
 
 	//Luôn để hàm này sau tất cả lệnh cấu hình đường dẫn với RBAC
 	rbac.BuildPublicRoute(app)
