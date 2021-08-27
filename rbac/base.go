@@ -17,7 +17,6 @@ Tạo cấu hình mặc định cho RBAC
 func NewConfig() Config {
 	return Config{
 		ForbidOverAllow:           true,
-		RootAllow:                 false,
 		AuthService:               "",
 		MakeUnassignedRoutePublic: false,
 	}

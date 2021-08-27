@@ -1,6 +1,8 @@
 package rbac
 
 import (
+	"fmt"
+
 	"github.com/TechMaster/core/pmodel"
 	"github.com/TechMaster/core/session"
 
@@ -12,6 +14,7 @@ import (
 //Hàm này cần được gọi trước tất cả handler do lập trình viên viết
 func CheckRoutePermission(ctx iris.Context) {
 	route := ctx.GetCurrentRoute().String() //Lấy route trong ctx
+	fmt.Println(route)
 	authinfo, _ := session.GetAuthInfo(ctx)
 
 	//Nếu route không thuộc nhóm public routes cần kiểm tra phân quyền
@@ -36,15 +39,6 @@ func CheckRoutePermission(ctx iris.Context) {
 	if authinfo == nil {
 		logger.Log(ctx, eris.Warning("Bạn chưa đăng nhập").UnAuthorized())
 		return
-	}
-
-	// Nếu RBAC cho phép Root permission bỏ qua logic check role
-	// authinfo phải chứa role allow ROOT
-	if config.RootAllow {
-		if hasRoot := authinfo.Roles[ROOT]; hasRoot != nil && hasRoot.(bool) {
-			ctx.Next()
-			return
-		}
 	}
 
 	allowGoNext := checkUser_RouteRole_Intersect(authinfo.Roles, routesRoles[route])

@@ -13,6 +13,8 @@ func RegisterRoute(app *iris.Application) {
 	app.Post("/login", controller.Login)
 	rbac.Get(app, "/secret", rbac.AllowAll(), controller.ShowSecret)
 	rbac.Get(app, "/logout", rbac.AllowAll(), controller.LogoutFromWeb)
+
+	
 	rbac.Get(app, "/changerole", rbac.Allow(rbac.ADMIN), controller.ShowChangeRoleForm)
 	rbac.Post(app, "/changerole", rbac.Allow(rbac.ADMIN), controller.ChangeRole)
 

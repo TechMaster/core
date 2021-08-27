@@ -6,7 +6,6 @@ import "github.com/TechMaster/core/pmodel"
 Nếu thêm sửa xoá role thì cập nhật danh sách const này
 */
 const (
-	ROOT       = 0 //Role đặc biệt, vượt qua mọi logic kiểm tra quyền khi config.RootAllow = true.
 	ADMIN      = 1
 	STUDENT    = 2
 	TRAINER    = 3
@@ -18,11 +17,10 @@ const (
 )
 
 //Mảng này phải tương ứng với danh sách const khai báo ở trên
-var allRoles = []int{ROOT, ADMIN, STUDENT, TRAINER, SALE, EMPLOYER, AUTHOR, EDITOR, MAINTAINER}
+var allRoles = []int{ADMIN, STUDENT, TRAINER, SALE, EMPLOYER, AUTHOR, EDITOR, MAINTAINER}
 
 //Dùng để in role kiểu int ra string cho dễ hiếu
 var roleName = map[int]string{
-	ROOT:       "root",
 	ADMIN:      "admin",
 	STUDENT:    "student",
 	TRAINER:    "trainer",

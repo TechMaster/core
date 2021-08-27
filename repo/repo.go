@@ -14,12 +14,13 @@ import (
 var users = make(map[string]*pmodel.User)
 
 func init() {
+	CreateNewUser("Admin", "1", "admin@gmail.com", "0123776000", rbac.ADMIN)
 	CreateNewUser("Bùi Văn Hiên", "1", "hien@gmail.com", "0123456789", rbac.TRAINER, rbac.MAINTAINER)
 	CreateNewUser("Nguyễn Hàn Duy", "1", "duy@gmail.com", "0123456786", rbac.TRAINER, rbac.STUDENT)
 	CreateNewUser("Phạm Thị Mẫn", "1", "man@gmail.com", "0123456780", rbac.SALE, rbac.STUDENT)
 	CreateNewUser("Trịnh Minh Cường", "1", "cuong@gmail.com", "0123456000", rbac.ADMIN, rbac.TRAINER)
 	CreateNewUser("Nguyễn Thành Long", "1", "long@gmail.com", "0123456001", rbac.STUDENT)
-	CreateNewUser("Dương Văn Thịnh", "1", "thinh@gmail.com", "0223456001", rbac.AUTHOR)
+	CreateNewUser("Dương Văn Thịnh", "1", "thinh@gmail.com", "0223456001", rbac.AUTHOR, rbac.EDITOR, rbac.EMPLOYER, rbac.STUDENT)
 }
 
 func CreateNewUser(fullName string, password string, email string, phone string, roles ...int) {

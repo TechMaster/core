@@ -26,7 +26,6 @@ func main() {
 	app.Use(session.Sess.Handler())
 
 	rbacConfig := rbac.NewConfig()
-	rbacConfig.RootAllow = true
 	rbacConfig.MakeUnassignedRoutePublic = true
 	rbac.Init(rbacConfig) //Khởi động với cấu hình mặc định
 	//đặt hàm này trên các hàm đăng ký route - controller

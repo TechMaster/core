@@ -2,6 +2,7 @@ package rbac
 
 import (
 	"net/http"
+	"regexp"
 
 	"github.com/TechMaster/core/pmodel"
 
@@ -15,6 +16,10 @@ route = HTTP method + path
 roles là kết quả trả về từ hàm kiểu roleExp()
 */
 func assignRoles(method string, path string, roles pmodel.Roles) {
+	//Sử dụng regex để thay thế double slashes bằng single slash
+	re, _ := regexp.Compile("/+")
+	path = re.ReplaceAllLiteralString(path, "/")
+
 	routesRoles[method+" "+path] = roles
 
 	if httpVerbRole := pathsRoles[path]; httpVerbRole == nil {
