@@ -9,6 +9,7 @@ Module này tổng hợp nhiều package hữu dụng, sử dụng cùng với I
 6. pmodel: định nghĩa cấu trúc dữ liệu dùng chung giữa package rbac, session
 7. db: kết nối CSDL Postgresql
 8. email: gửi email theo nhiều cách khác nhau
+9. logger
 
 ![](doc/diagram.jpg)
 
@@ -22,6 +23,25 @@ Chú ý do module core luôn đi cùng với module iris, viper do đó bạn c�
 go get -u github.com/kataras/iris/v12@master
 ```
 
+#### Chạy thử được luôn ví dụ về module core
+Để thử nghiệm nhanh các tính năng của module core bằng cách:
+```
+git clone https://github.com/TechMaster/core.git
+cd core
+go mod tidy
+```
+
+Khởi động một redis server. Trước đó hãy tạo thư mục data để map volume
+```
+docker run --name=redis -p 6379:6379 -d --requirepass "123" -v $PWD/data:/data redis:alpine3.14
+```
+
+Chạy lệnh
+```
+go run main.go
+```
+
+Truy cập địa chỉ http://localhost:9001, login thử với các user khác nhau
 ## 2. Ví dụ hàm main.go sử dụng module core
 ```go
 package main
@@ -32,8 +52,9 @@ import (
 	"github.com/TechMaster/core/config"
 	"github.com/TechMaster/core/rbac"
 	"github.com/TechMaster/core/session"
+	"github.com/TechMaster/core/sessions"
 	"github.com/TechMaster/core/template"
-	"github.com/TechMaster/logger"
+	"github.com/TechMaster/core/logger"
 	"github.com/kataras/iris/v12"
 	"github.com/spf13/viper"
 )
@@ -101,16 +122,24 @@ func IsAppInDebugMode() bool {
 	return false
 }
 ```
+## 4. Logger
+Trước đây logger phát hành thành một module riêng [https://github.com/techmaster/logger](https://github.com/techmaster/logger), nay chuyển logger vào đây thành một package cho dễ quản lý
 
-## 4. Sử dụng Session
-### 4.1 Chạy ứng dụng đơn lẻ độc lập
+```go
+logFile := logger.Init() //Cần phải có 2 file error.html và info.html ở /views
+if logFile != nil {
+	defer logFile.Close()
+}
+```
+## 5. Sử dụng Session
+### 5.1 Chạy ứng dụng đơn lẻ độc lập
 Nếu bạn viết ứng dụng đơn lẻ thì có thể lưu trực tiếp session vào vùng nhớ của ứng dụng web. Khi này bạn không cần dùng Redis hay bất kỳ CSDL.
 
 Hàm khởi tạo Session trong file main.go sẽ như sau
 ```go
 app.Use(session.Sess.Handler())
 ```
-### 4.2 Nhiều ứng dụng dùng chung session database
+### 5.2 Nhiều ứng dụng dùng chung session database
 Khi có nhiều ứng dụng web, microservice dùng chung một domain nhưng định địa chỉ bằng các sub domain khác nhau, để có được chức năng Single Sign On (đăng nhập một lần, nhưng truy cập được nhiều site cùng chung domain), chúng ta buộc phải lưu session ra database chung ví dụ như Redis.
 
 ```go
@@ -119,7 +148,28 @@ defer redisDb.Close()
 app.Use(session.Sess.Handler())
 ```
 
-## 5. Sử dụng RBAC
+### 5.3 Chức năng cập nhật role chỉ dành cho Admin
+Khi Admin thay đổi role người dùng. Người này không cần logout mà role có tác dụng ngay, trên mọi thiết bị anh ta đang đăng nhập.
+
+```go
+func UpdateRole(userID string, roles []int) error
+```
+
+Xem chi tiết [controller/changerole.go](controller/changerole.go) và [session/update_role.go](session/update_role.go)
+
+Để thực hiện được tính năng này phải lưu quan hệ một user.Id chứa một tập các Session.id. Khi cập nhật Roles cho một user.Id chúng ta nhanh chóng tìm được tất cả các Session của user đó để cập nhật. Ngoài ra phải đặt Expire time để xoá bản ghi này.
+
+Nếu vì một nguyên nhân nào đó, thuật toán đồng bộ Role của user trên mọi thiết bị bị lỗi. User có thể logout rồi login lại.
+Thuật toán này chưa hoàn hảo, nó có thể để lại rác trong Redis trong một số trường hợp.
+
+Hiện nay tôi copy toàn bộ package https://github.com/kataras/iris/tree/master/sessions vào thư mục sessions. Hiện chưa sửa đổi gì. Tuy nhiên sẽ fix bug ngay nếu package này có lỗi.
+### 5.4 Chức năng Logout
+Trong framework Iris, khi người dùng logout ở một trình duyệt trên một thiết bị, không làm sao xoá được key = sessionID. Hàm này không những xoá key = sessionID mà còn sửa lại entry UserID bỏ bớt phần tử sessionID
+```go
+func Logout(ctx iris.Context) error
+```
+
+## 6. Sử dụng RBAC
 Cần khởi tạo và cấu hình RBAC trong file main.go
 Sau đó trong router viết hàm đăng ký route + controller
 
@@ -181,7 +231,7 @@ const (
 	MAINTAINER = 8 //quản trị hệ thống, gánh bớt việc cho Admin, back up dữ liệu. Sửa đổi profile,role user, ngoại trừ role ROOT và Admin
 )
 ```
-## 6. Cấu trúc dữ liệu trong pmodel
+## 7. Cấu trúc dữ liệu trong pmodel
 
 pmodel là nơi định nghĩa cấu trúc dữ liệu phụ vụ việc đăng nhập, quản lý người dùng
 
@@ -213,7 +263,7 @@ Chuyển đổi kiểu intArray trong đó mỗi phần tử ứng với một r
 func IntArrToRoles(intArr []int) Roles
 ```
 
-## 7. Template Engine
+## 8. Template Engine
 Hiện chưa viết được nhiều hàm phụ trợ. Sau sẽ bổ xung thêm.
 Chủ yếu sử dụng Blocks template của iris. Nếu thư viện này có lỗi sẽ clone và tạo thư viện mới.
 Chú ý để dùng được `*view.BlocksEngine` bạn phải lấy bản mới nhất thư viện Iris
@@ -236,7 +286,7 @@ func InitViewEngine(app *iris.Application) {
 	app.RegisterView(ViewEngine)
 }
 ```
-## 8. Resto thư viện REST client dựa trên cơ chế retry
+## 9. Resto thư viện REST client dựa trên cơ chế retry
 ```go
 response, err := resto.Retry(numberOfTimesToTry, numberOfMilliSecondsToWait).Post(url, jsondata)
 response, err := resto.Retry(numberOfTimesToTry, numberOfMilliSecondsToWait).Get(url)
@@ -259,7 +309,7 @@ if response.StatusCode != iris.StatusOK {
 }
 ```
 
-## 9. db kết nối CSDL Postgresql
+## 10. db kết nối CSDL Postgresql
 ```go
 db.ConnectPostgresqlDB(config.Config) //Kết nối vào  CSDL
 defer db.DB.Close()
@@ -277,7 +327,7 @@ Cấu hình kết nối CSDL để ở trong file `config.dev.json` và `config.
 }
 ```
 
-## 10. email
+## 11. email
 
 Đầu tiên là interface gửi email trong [mail_sender.go](email/mail_sender.go)
 ```go
@@ -308,7 +358,7 @@ type EmailStore struct {
 ```
 Trong tương lai tôi sẽ bổ xung thêm vài biến thể gửi mail tuân thủ `type MailSender interface`
 
-## 11. pass các hàm băm password
+## 12. pass các hàm băm password
 Tuyệt đối không được lưu secret key hay các chuỗi nhạy cảm vào đây. Xem chi tiết [pass/password.go](pass/password.go)
 
 Băm password bằng thư viện Bcrypt
@@ -337,6 +387,8 @@ func CheckPassword(inputpass string, hashedpass string, salt string) bool {
 	}
 }
 ```
+
+
 ## Để phát hành phiên bản mới module này cần làm những bước sau
 Thay v0.1.3 bằng phiên bản thực tế
 ```

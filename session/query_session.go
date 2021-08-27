@@ -3,9 +3,9 @@ package session
 import (
 	"github.com/TechMaster/core/pmodel"
 
+	"github.com/TechMaster/core/sessions"
 	"github.com/TechMaster/eris"
 	"github.com/kataras/iris/v12"
-	"github.com/kataras/iris/v12/sessions"
 	"github.com/mitchellh/mapstructure"
 )
 

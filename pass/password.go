@@ -12,7 +12,7 @@ Bcrypt băm password rất chậm, tuy nhiên mỗi lần băm, cùng một chu�
 Tránh lỗ hổng bảo mật khi hacker truy theo rainbow table, bảng những password băm sẵn
 */
 func HashBcryptPass(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 3)
 	return string(bytes), err
 }
 
