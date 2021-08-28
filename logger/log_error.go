@@ -43,7 +43,7 @@ func Log(ctx iris.Context, err error) {
 				ctx.ViewData("Data", string(bytes))
 			}
 		}
-		_ = ctx.View(logConfig.ErrorTemplate)
+		_ = ctx.View(LogConf.ErrorTemplate)
 		return
 
 	default: //Lỗi thông thường
@@ -52,7 +52,7 @@ func Log(ctx iris.Context, err error) {
 			ctx.StatusCode(iris.StatusInternalServerError)
 			_, _ = ctx.JSON(err.Error())
 		} else {
-			_ = ctx.View(logConfig.ErrorTemplate, iris.Map{
+			_ = ctx.View(LogConf.ErrorTemplate, iris.Map{
 				"ErrorMsg": err.Error(),
 			})
 		}

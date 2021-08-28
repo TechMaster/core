@@ -1,13 +1,25 @@
 # Những thay đổi
+
+
+### 0.1.25
+Sửa lỗi khi hàm [CheckRoutePermission](../rbac/check_permission.go) trong package rbac gọi
+`logger.Log()` thì logger không tìm được view template để hiển thị lỗi. 
+
+Mặc dù trước đó đã khởi tạo trong hàm `func Init(logConfig ...LogConfig) *os.File`
+
+Thử chuyển `var logConfig LogConfig` sang thành `var LogConf *LogConfig`
+
+
 ### 0.1.24
-Fix lỗi Internal Server Error do không có file default.html trong thư mục view/layouts/
+Fix lỗi Internal Server Error do không có file [views/layout/default.html](../views/layouts/default.html)
+
 Trước khi sửa file [template/base.go](../template/base.go)
 ```go
 func InitViewEngine(app *iris.Application) {
 	InitBlockEngine(app, "./views", "default")
 }
 ```
-Sau khi sửa
+Sau khi sửa, gán tham số default layout là ""
 ```go
 func InitViewEngine(app *iris.Application) {
 	InitBlockEngine(app, "./views", "")
