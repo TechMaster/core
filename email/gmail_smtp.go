@@ -6,7 +6,6 @@ import (
 	"net/smtp"
 
 	"github.com/TechMaster/core/template"
-
 	"github.com/TechMaster/eris"
 )
 

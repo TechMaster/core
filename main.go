@@ -7,6 +7,7 @@ import (
 	"github.com/TechMaster/core/router"
 	"github.com/TechMaster/core/session"
 	"github.com/TechMaster/core/template"
+
 	"github.com/kataras/iris/v12"
 	"github.com/spf13/viper"
 )
@@ -32,7 +33,10 @@ func main() {
 	app.Use(rbac.CheckRoutePermission)
 	router.RegisterRoute(app)
 
-	template.InitViewEngine(app, "./view")
+	template.InitBlockEngine(app, "./views", "default")
+	template.BlockEngine.AddFunc("listmenu", func() []string {
+		return []string{"home", "products", "about"}
+	})
 
 	//Luôn để hàm này sau tất cả lệnh cấu hình đường dẫn với RBAC
 	rbac.BuildPublicRoute(app)

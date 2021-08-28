@@ -65,7 +65,7 @@ import (
 	"github.com/TechMaster/core/rbac"
 	"github.com/TechMaster/core/session"
 	"github.com/TechMaster/core/sessions"
-	"github.com/TechMaster/core/template"
+	"github.com/TechMaster/core/tmpl"
 	"github.com/TechMaster/core/logger"
 	"github.com/kataras/iris/v12"
 	"github.com/spf13/viper"
@@ -320,28 +320,54 @@ func IntArrToRoles(intArr []int) Roles
 ```
 
 ## 8. Template Engine
-Hiện chưa viết được nhiều hàm phụ trợ. Sau sẽ bổ xung thêm.
-Chủ yếu sử dụng Blocks template của iris. Nếu thư viện này có lỗi sẽ clone và tạo thư viện mới.
-Chú ý để dùng được `*view.BlocksEngine` bạn phải lấy bản mới nhất thư viện Iris
-```
-go get -u github.com/kataras/iris/v12@master
-```
-[template/base.go](template/base.go)
+Trong template có 2 hàm khởi tạo View Template Engine. 
+- `viewFolder`: thư mục chứa view template. Mặc định nên để là [views](views)
+- `defaultLayout`: tên file template layout mặc định. Mặc định nó phải nằm trong thư mục `layouts` bên trong thư mục chứa view template.
+
 ```go
-package template
+//Nếu bạn dùng HTML template
+func InitHTMLEngine(app *iris.Application, viewFolder string, defaultLayout string)
 
-import (
-	"github.com/kataras/iris/v12"
-	"github.com/kataras/iris/v12/view"
-)
-
-var ViewEngine *view.BlocksEngine
-
-func InitViewEngine(app *iris.Application) {
-	ViewEngine = iris.Blocks("./views", ".html")
-	app.RegisterView(ViewEngine)
-}
+//Nếu bạn dùng Block template
+func InitBlockEngine(app *iris.Application, viewFolder string, defaultLayout string)
 ```
+
+Tốt nhất bạn nên tuân thủ cấu trúc thư mục như sau
+```
+views
+├── layouts
+│   └── default.html  -> layout mặc định
+├── partials  -> template component hiển thị một phần hay dùng lại của trang web
+│   ├── footer.html
+│   ├── header.html
+│   └── menu.html
+├── changerole.html
+├── error.html -> trang hiển thị lỗi. logger.Log cần phải có
+├── index.html
+└── info.html -> trang hiển thị thông báo. logger.Log cần phải có
+```
+
+
+Tôi đã copy code ở [https://github.com/kataras/blocks](https://github.com/kataras/blocks) vào thư mục [blocks](blocks)
+[Sửa lại lỗi không đặt được layout mặc định](https://github.com/kataras/blocks/issues/2)
+
+Trong hàm [main.go](main.go) cấu hình view template engine như sau
+
+```go
+template.InitBlockEngine(app, "./views", "default")
+```
+
+Hỏi: Làm sao để bổ xung custom function vào view template engine?
+
+Đáp: Hãy gọi biến global ứng với template engine bạn chọn. Ví dụ bạn dùng BlockEngine
+```go
+template.BlockEngine.AddFunc("listmenu", func() []string {
+	return []string{"home", "products", "about"}
+})
+```
+
+
+
 ## 9. Resto thư viện REST client dựa trên cơ chế retry
 ```go
 response, err := resto.Retry(numberOfTimesToTry, numberOfMilliSecondsToWait).Post(url, jsondata)

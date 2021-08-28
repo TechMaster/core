@@ -1,4 +1,13 @@
 # Những thay đổi
+
+### 0.1.21
+Sửa lại template để hỗ trợ khởi tạo HTML và Block Engine
+```go
+func InitHTMLEngine(app *iris.Application, viewFolder string, defaultLayout string) 
+func InitBlockEngine(app *iris.Application, viewFolder string, defaultLayout string)
+```
+Tôi đã copy code ở [https://github.com/kataras/blocks](https://github.com/kataras/blocks) vào thư mục [blocks](blocks)
+[Sửa lại lỗi không đặt được layout mặc định](https://github.com/kataras/blocks/issues/2)
 ### 0.1.19
 Sửa lại hàm để hỗ trợ 4 hình thức
 1. Debug app
