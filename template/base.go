@@ -14,7 +14,7 @@ var ViewEngine context.ViewEngine    //generic interface cho các loại view en
 
 //Mặc định dùng Block View Engine, thư mục view templates là views, layout mặc định là file views/layout/default.html
 func InitViewEngine(app *iris.Application) {
-	InitBlockEngine(app, "./views", "default")
+	InitBlockEngine(app, "./views", "")
 }
 
 /*

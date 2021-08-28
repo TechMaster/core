@@ -33,7 +33,8 @@ func main() {
 	app.Use(rbac.CheckRoutePermission)
 	router.RegisterRoute(app)
 
-	template.InitViewEngine(app)
+	template.InitBlockEngine(app, "./views", "default")
+
 	template.BlockEngine.AddFunc("listmenu", func() []string {
 		return []string{"home", "products", "about"}
 	})

@@ -1,5 +1,18 @@
 # Những thay đổi
-
+### 0.1.24
+Fix lỗi Internal Server Error do không có file default.html trong thư mục view/layouts/
+Trước khi sửa file [template/base.go](../template/base.go)
+```go
+func InitViewEngine(app *iris.Application) {
+	InitBlockEngine(app, "./views", "default")
+}
+```
+Sau khi sửa
+```go
+func InitViewEngine(app *iris.Application) {
+	InitBlockEngine(app, "./views", "")
+}
+```
 ### 0.1.23
 Sửa lỗi khi eris.Err cấp độ từ Error, SysError, Panic không in ra console đủ strack track
 

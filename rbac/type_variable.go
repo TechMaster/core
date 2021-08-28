@@ -74,12 +74,6 @@ type Config struct {
 	*/
 	ForbidOverAllow bool
 
-	/* Nếu RootAllow bằng true thì người có role là Root sẽ
-	vượt qua tất cả logic kiểm tra permission.
-	Mặc định RootAllow = false
-	*/
-	RootAllow bool
-
 	/*
 		Đường dẫn đến AuthService trong mạng Docker Compose, Docker Swarm
 		"" nếu RBAC không cần kết nối đến AuthService
