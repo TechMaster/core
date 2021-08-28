@@ -1,5 +1,61 @@
 # Những thay đổi
 
+### 0.1.23
+Sửa lỗi khi eris.Err cấp độ từ Error, SysError, Panic không in ra console đủ strack track
+
+Nếu khởi tạo giá trị của ErisStringFormat ở scope package global, lúc này `logConfig.Top` chưa được khởi tạo giá trị, mặc định là 0 dẫn đến không in ra được stack track
+```go
+var ErisStringFormat = eris.StringFormat{
+		Options: eris.FormatOptions{
+			InvertOutput: false, // flag that inverts the error output (wrap errors shown first)
+			WithTrace:    true,  // flag that enables stack trace output
+			InvertTrace:  true,  // flag that inverts the stack trace output (top of call stack shown first)
+			WithExternal: false,
+			Top:          logConfig.Top, // Chỉ lấy 3 dòng lệnh đầu tiên
+			//Mục tiêu để báo lỗi gọn hơn, stack trace đủ ngắn
+		},
+		MsgStackSep:  "\n",  // separator between error messages and stack frame data
+		PreStackSep:  "\t",  // separator at the beginning of each stack frame
+		StackElemSep: " | ", // separator between elements of each stack frame
+		ErrorSep:     "\n",  // separator between each error in the chain
+	}
+```
+
+Cần phải chuyển vào
+
+```go
+var ErisStringFormat eris.StringFormat //khai báo biến global ErisStringFormat
+
+func Init(_logConfig ...LogConfig) *os.File {
+	if len(_logConfig) > 0 {
+		logConfig = _logConfig[0]
+	} else { //Truyền cấu hình nil thì tạo cấu hình mặc định
+		logConfig = LogConfig{
+			LogFolder:     "logs/", // thư mục chứa log file. Nếu rỗng có nghĩa là không ghi log ra file
+			ErrorTemplate: "error", // tên view template sẽ render error page
+			InfoTemplate:  "info",  // tên view template sẽ render info page
+			Top:           3,       // số dòng đầu tiên trong stack trace sẽ được giữ lại
+		}
+	}
+
+	//Khởi tạo biến ở đây, sau khi logConfig.Top được gán giá trị mới đúng
+	ErisStringFormat = eris.StringFormat{
+		Options: eris.FormatOptions{
+			InvertOutput: false, // flag that inverts the error output (wrap errors shown first)
+			WithTrace:    true,  // flag that enables stack trace output
+			InvertTrace:  true,  // flag that inverts the stack trace output (top of call stack shown first)
+			WithExternal: false,
+			Top:          logConfig.Top, // Chỉ lấy 3 dòng lệnh đầu tiên
+			//Mục tiêu để báo lỗi gọn hơn, stack trace đủ ngắn
+		},
+		MsgStackSep:  "\n",  // separator between error messages and stack frame data
+		PreStackSep:  "\t",  // separator at the beginning of each stack frame
+		StackElemSep: " | ", // separator between elements of each stack frame
+		ErrorSep:     "\n",  // separator between each error in the chain
+	}
+}
+```
+
 ### 0.1.21
 Sửa lại template để hỗ trợ khởi tạo HTML và Block Engine
 ```go

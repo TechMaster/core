@@ -9,21 +9,6 @@ import (
 	"github.com/goccy/go-json"
 )
 
-var ErisStringFormat = eris.StringFormat{
-	Options: eris.FormatOptions{
-		InvertOutput: false, // flag that inverts the error output (wrap errors shown first)
-		WithTrace:    true,  // flag that enables stack trace output
-		InvertTrace:  true,  // flag that inverts the stack trace output (top of call stack shown first)
-		WithExternal: false,
-		Top:          logConfig.Top, // Chỉ lấy 3 dòng lệnh đầu tiên
-		//Mục tiêu để báo lỗi gọn hơn, stack trace đủ ngắn
-	},
-	MsgStackSep:  "\n",  // separator between error messages and stack frame data
-	PreStackSep:  "\t",  // separator at the beginning of each stack frame
-	StackElemSep: " | ", // separator between elements of each stack frame
-	ErrorSep:     "\n",  // separator between each error in the chain
-}
-
 //Hàm chuyên xử lý Eris Error có Stack Trace. Chỉ áp dụng với cấp độ lỗi ERROR, SYSERROR, PANIC
 func logErisError(err *eris.Error) {
 	formattedStr := eris.ToCustomString(err, ErisStringFormat) //Định dạng lỗi Eris

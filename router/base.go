@@ -10,6 +10,9 @@ import (
 
 func RegisterRoute(app *iris.Application) {
 	app.Get("/", controller.ShowHomePage)
+
+	app.Get("/err", controller.ShowErr)
+
 	app.Post("/login", controller.Login)
 	rbac.Get(app, "/secret", rbac.AllowAll(), controller.ShowSecret)
 	rbac.Get(app, "/logout", rbac.AllowAll(), controller.LogoutFromWeb)
