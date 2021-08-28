@@ -12,6 +12,11 @@ var HTMLEngine *view.HTMLEngine
 var BlockEngine *blocks.BlocksEngine //Đây là
 var ViewEngine context.ViewEngine    //generic interface cho các loại view engine
 
+//Mặc định dùng Block View Engine, thư mục view templates là views, layout mặc định là file views/layout/default.html
+func InitViewEngine(app *iris.Application) {
+	InitBlockEngine(app, "./views", "default")
+}
+
 /*
 viewFolder: thư mục chứa View Template
 defaultLayout: template layout mặc định
@@ -24,6 +29,7 @@ func InitHTMLEngine(app *iris.Application, viewFolder string, defaultLayout stri
 	app.RegisterView(HTMLEngine)
 }
 
+//Khởi tạo Block Engine. Code ở github.com/TechMaster/core/blocks
 func InitBlockEngine(app *iris.Application, viewFolder string, defaultLayout string) {
 	BlockEngine = blocks.NewBlocks(viewFolder, ".html")
 	//Nếu app đang debug thì reload bằng true
