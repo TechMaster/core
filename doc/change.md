@@ -1,5 +1,9 @@
 # Những thay đổi
 
+### 0.1.26
+
+Bổ xung hàm `func Log2(err error)` trong package logger. Xem tại [logger/log2.go](../logger/log2.go).
+Hàm này cho phép log lỗi mà không cần tham số `ctx iris.Context`.
 
 ### 0.1.25
 Sửa lỗi khi hàm [CheckRoutePermission](../rbac/check_permission.go) trong package rbac gọi

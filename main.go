@@ -7,6 +7,7 @@ import (
 	"github.com/TechMaster/core/router"
 	"github.com/TechMaster/core/session"
 	"github.com/TechMaster/core/template"
+	"github.com/TechMaster/eris"
 
 	"github.com/kataras/iris/v12"
 	"github.com/spf13/viper"
@@ -35,9 +36,8 @@ func main() {
 
 	template.InitBlockEngine(app, "./views", "default")
 
-	template.BlockEngine.AddFunc("listmenu", func() []string {
-		return []string{"home", "products", "about"}
-	})
+	logger.Log2(eris.SysError("Thử một lỗi ngớ ngẩn xem sao"))
+	eris.New("").SetType(eris.WARNING).BadRequest()
 
 	//Luôn để hàm này sau tất cả lệnh cấu hình đường dẫn với RBAC
 	rbac.BuildPublicRoute(app)

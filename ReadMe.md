@@ -134,7 +134,10 @@ func IsAppInDebugMode() bool {
 }
 ```
 ## 4. Logger
-Trước đây logger phát hành thành một module riêng [https://github.com/techmaster/logger](https://github.com/techmaster/logger), nay chuyển logger vào đây thành một package cho dễ quản lý
+**Chú ý: nếu đã dùng module github.com/TechMaster/core thì buộc phải dùng cả github.com/TechMaster/core/logger. Tuyệt đối không dùng github.com/TechMaster/logger !**
+
+Khởi tạo mặc định, bạn cần tạo một thư mục logs để logger ghi vào file log. 
+Trong thư mục views cần phải có file [views/error.html](views/error.html) để hiển thị lỗi và [views/info.html](views/info.html) để hiển thị thông tin ra trình duyệt kiểu server side rendering
 
 ```go
 logFile := logger.Init() //Cần phải có 2 file error.html và info.html ở /views
@@ -142,6 +145,50 @@ if logFile != nil {
 	defer logFile.Close()
 }
 ```
+
+Khởi tạo có cấu hình riêng. Nếu stack trace lỗi quá dài dòng, bạn có thể đặt `LogConfig.Top` giảm xuống 2 hoặc 3
+```go
+logFile := logger.Init(LogConfig{
+			LogFolder:     "mylog/", // thư mục chứa log file. Nếu rỗng có nghĩa là không ghi log ra file
+			ErrorTemplate: "error", // tên view template sẽ render error page
+			InfoTemplate:  "info",  // tên view template sẽ render info page
+			Top:           4,       // số dòng đầu tiên trong stack trace sẽ được giữ lại
+		}
+)
+if logFile != nil {
+	defer logFile.Close()
+}
+```
+
+#### logger cung cấp 2 hàm log lỗi và 1 hàm log info
+```go
+func Log(ctx iris.Context, err error)  //Sử dụng trong logic xử lý HTTP request đến Iris framework
+func Log2(err error)  //Log lỗi mà không báo về cho HTTP client
+func Info(ctx iris.Context, msg string, redirectLink ...string) //Thông báo
+```
+
+#### Quy ước báo lỗi như sau:
+1. Những lỗi do người dùng (HTTP client) tạo ra không ảnh hưởng gì đến ứng dụng ví dụ nhập sai dữ liệu... chỉ tạo 
+```go
+logger.Log(ctx, eris.Warning("Email không hợp lệ").BadRequest()
+logger.Log(ctx, eris.NewFromMsg(err, "Không đọc được dữ liệu gửi lên").SetType(eris.WARNING).BadRequest())
+```
+Việc đặt cấp độ lỗi cao chỉ làm rác console log hoặc log file của ứng dụng, không giải quyết được vấn đề gì cả
+
+2. Những lỗi thực sự do ứng dụng gây ra thì đặt ở cấp độ `ERROR`, `SYSERROR`, `PANIC`. Trước khi gọi lệnh panic hãy cố gắng log lỗi ra file
+
+```go
+logger.Log2(eris.NewFromMsg(err, "Lỗi đặc biệt nghiêm trọng").SetType(eris.PANIC))  //log ra file
+panic(err) //rồi cho hệ thống sập !
+```
+3. Cần đặt đúng loại lỗi. Việc này giúp client xử lý lỗi tốt hơn như:
+```go
+eris.Warning().BadRequest() 					//Yêu cầu gửi lên bị lỗi
+eris.Warning().UnAuthorized() 				//Người dùng không đủ quyền để thực thi
+eris.Warning().NotFound() 						//Không tìm thấy bản ghi hay tài nguyên trên server
+eris.Warning().InternalServerError() 	//Dành cho hầu hết lỗi phát sinh phía server
+```
+
 ## 5. Sử dụng Session
 ### 5.1 Chạy ứng dụng đơn lẻ độc lập
 Nếu bạn viết ứng dụng đơn lẻ thì có thể lưu trực tiếp session vào vùng nhớ của ứng dụng web. Khi này bạn không cần dùng Redis hay bất kỳ CSDL.
