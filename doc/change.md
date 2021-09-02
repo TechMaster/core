@@ -1,4 +1,45 @@
 # Những thay đổi
+### 0.1.27
+
+Bổ xung ứng dụng Vue3 [bookvue](../bookvue/ReadMe.md) demo tính năng tự động login của Vuejs
+[bookvue/src/App.vue](../bookvue/src/App.vue)
+```javascript
+async fetchBooks() {
+	try {
+		this.error = null
+		this.loading = true
+		const url = `http://localhost:9001/api/books`
+		axios.defaults.withCredentials = true;
+		axios.defaults.headers.post['Content-Type'] = 'application/json';
+		const response = await axios.get(url)
+
+		if (response.status != 200) {
+			console.log(response)
+		} else {
+			this.books = response.data.books
+			this.authinfo = response.data.authinfo
+		}
+		
+	} catch (err) {       
+		console.log(err)
+	}
+	this.loading = false
+}
+```
+
+File [main.go](../main.go) bổ xung thêm CORS middleware
+```go
+crs := cors.New(cors.Options{
+	AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:9001"},
+	AllowCredentials: true,
+})
+app.UseRouter(crs)
+```
+
+File [pass.go](../pass/password.go) sửa lại dòng này thành
+```go
+return pass.VerifyPassword(inputpass, hashedpass, salt) //Sửa theo yêu cầu Nhật Đức
+```
 
 ### 0.1.26
 

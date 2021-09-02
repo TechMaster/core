@@ -9,6 +9,8 @@ import (
 	"github.com/TechMaster/core/template"
 	"github.com/TechMaster/eris"
 
+	"github.com/iris-contrib/middleware/cors"
+
 	"github.com/kataras/iris/v12"
 	"github.com/spf13/viper"
 )
@@ -25,6 +27,12 @@ func main() {
 	redisDb := session.InitRedisSession()
 	defer redisDb.Close()
 
+	crs := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:9001"},
+		AllowCredentials: true,
+	})
+	app.UseRouter(crs)
+
 	app.Use(session.Sess.Handler())
 
 	rbacConfig := rbac.NewConfig()
@@ -32,12 +40,12 @@ func main() {
 	rbac.Init(rbacConfig) //Khởi động với cấu hình mặc định
 	//đặt hàm này trên các hàm đăng ký route - controller
 	app.Use(rbac.CheckRoutePermission)
+
 	router.RegisterRoute(app)
 
 	template.InitBlockEngine(app, "./views", "default")
 
-	logger.Log2(eris.SysError("Thử một lỗi ngớ ngẩn xem sao"))
-	eris.New("").SetType(eris.WARNING).BadRequest()
+	logger.Log2(eris.SysError("Cuộc sống tốt đẹp. Hãy trận trọng và sống hết mình từng giây một"))
 
 	//Luôn để hàm này sau tất cả lệnh cấu hình đường dẫn với RBAC
 	rbac.BuildPublicRoute(app)

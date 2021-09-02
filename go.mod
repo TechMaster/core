@@ -11,8 +11,10 @@ require (
 	github.com/goccy/go-json v0.7.6
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-retryablehttp v0.7.0
+	github.com/iris-contrib/middleware/cors v0.0.0-20210110101738-6d0a4d799b5d
 	github.com/kataras/golog v0.1.7
 	github.com/kataras/iris/v12 v12.2.0-alpha2.0.20210717090056-b2cc3a287149
+	github.com/matoous/go-nanoid/v2 v2.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/segmentio/ksuid v1.0.4

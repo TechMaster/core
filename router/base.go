@@ -24,5 +24,6 @@ func RegisterRoute(app *iris.Application) {
 	{
 		api.Post("/login", controller.LoginREST)
 		api.Get("/logout", controller.LogoutREST)
+		rbac.Get(api, "/books", rbac.Allow(rbac.STUDENT, rbac.TRAINER), controller.Books)
 	}
 }

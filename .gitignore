@@ -3,3 +3,4 @@ logs/*.txt
 data/*.*
 *.aof
 *.rdb
+__debug_bin

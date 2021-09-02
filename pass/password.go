@@ -25,7 +25,7 @@ Hàm check password hỗ trợ cả kiểu SHA1 cũ và bcrypt mới
 func CheckPassword(inputpass string, hashedpass string, salt string) bool {
 	if salt != "" {
 		pass := p.NewPassword(sha1.New, 50, 64, 10000)
-		return pass.VerifyPassword(inputpass, hashedpass, hashedpass)
+		return pass.VerifyPassword(inputpass, hashedpass, salt) //Sửa theo yêu cầu Nhật Đức
 	} else {
 		err := bcrypt.CompareHashAndPassword([]byte(hashedpass), []byte(inputpass))
 		return err == nil
