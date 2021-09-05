@@ -1,4 +1,16 @@
 # Những thay đổi
+
+### 0.1.28
+Bổ xung tính năng gửi email sử dụng Asynq và Redis Stream
+Xem file [redis_mail.go](../email/redis_mail.go)
+
+Kiểm thử ở [redis_mail_test.go](../email/redis_mail_test.go)
+
+Cấu hình ở file [main.go](../main.go)
+```go
+asynClient := email.InitRedisMail()
+defer asynClient.Close()
+```
 ### 0.1.27
 
 Bổ xung ứng dụng Vue3 [bookvue](../bookvue/ReadMe.md) demo tính năng tự động login của Vuejs

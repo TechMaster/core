@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/TechMaster/core/config"
+	"github.com/TechMaster/core/email"
 	"github.com/TechMaster/core/logger"
 	"github.com/TechMaster/core/rbac"
 	"github.com/TechMaster/core/router"
@@ -49,5 +50,10 @@ func main() {
 
 	//Luôn để hàm này sau tất cả lệnh cấu hình đường dẫn với RBAC
 	rbac.BuildPublicRoute(app)
+
+	//Khởi động email redis
+	asynClient := email.InitRedisMail()
+	defer asynClient.Close()
+
 	_ = app.Listen(viper.GetString("port"))
 }

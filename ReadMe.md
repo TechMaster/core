@@ -485,7 +485,9 @@ type EmailStore struct {
 	CreatedAt  time.Time
 }
 ```
-Trong tương lai tôi sẽ bổ xung thêm vài biến thể gửi mail tuân thủ `type MailSender interface`
+
+Phiên bản 0.1.28 bổ xung thêm gửi email qua Asynq và Redis Stream
+Xem [redis_mail.go](email/redis_mail.go)
 
 ## 12. pass các hàm băm password
 Tuyệt đối không được lưu secret key hay các chuỗi nhạy cảm vào đây. Xem chi tiết [pass/password.go](pass/password.go)

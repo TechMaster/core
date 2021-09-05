@@ -23,17 +23,17 @@ defaultLayout: template layout mặc định
 */
 func InitHTMLEngine(app *iris.Application, viewFolder string, defaultLayout string) {
 	HTMLEngine = iris.HTML(viewFolder, ".html")
+	ViewEngine = HTMLEngine //Gán vào biến này để phần email sẽ dùng
 	//Nếu app đang debug thì reload bằng true
 	HTMLEngine.Layout(defaultLayout).Reload(config.IsAppInDebugMode())
-	ViewEngine = HTMLEngine //Gán vào biến này để phần email sẽ dùng
 	app.RegisterView(HTMLEngine)
 }
 
 //Khởi tạo Block Engine. Code ở github.com/TechMaster/core/blocks
 func InitBlockEngine(app *iris.Application, viewFolder string, defaultLayout string) {
 	BlockEngine = blocks.NewBlocks(viewFolder, ".html")
+	ViewEngine = BlockEngine //Gán vào biến này để phần email sẽ dùng
 	//Nếu app đang debug thì reload bằng true
 	BlockEngine.Layout(defaultLayout).Reload(config.IsAppInDebugMode())
-	ViewEngine = BlockEngine //Gán vào biến này để phần email sẽ dùng
 	app.RegisterView(BlockEngine)
 }
