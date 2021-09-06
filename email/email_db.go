@@ -1,10 +1,7 @@
 package email
 
 import (
-	"bytes"
 	"time"
-
-	"github.com/TechMaster/core/template"
 
 	"github.com/TechMaster/eris"
 	"github.com/go-pg/pg/v10"
@@ -42,17 +39,15 @@ func (emailDB EmailDB) SendPlainEmail(to []string, subject string, body string) 
 	return nil
 }
 
-func (emailDB EmailDB) SendHTMLEmail(to []string, subject string, tmplFile string, data map[string]interface{}) error {
-	viewEngine := template.ViewEngine
-	buf := new(bytes.Buffer)
-	if err := viewEngine.ExecuteWriter(buf, tmplFile, "", data); err != nil {
-		return eris.NewFromMsg(err, "Lỗi generate mail body")
+func (emailDB EmailDB) SendHTMLEmail(to []string, subject string, data map[string]interface{}, tmpl_layout ...string) error {
+	body, err := renderHTML(data, tmpl_layout...)
+	if err != nil {
+		return err
 	}
-
 	emailitem := EmailStore{
 		Receipient: to[0],
 		Subject:    subject,
-		Body:       buf.String(),
+		Body:       body,
 	}
 	if _, err := emailDB.db.Model(&emailitem).Insert(); err != nil {
 		return eris.NewFrom(err).InternalServerError()

@@ -116,6 +116,11 @@ func (s *BlocksEngine) Load() error {
 
 // ExecuteWriter renders a template on "w".
 func (s *BlocksEngine) ExecuteWriter(w io.Writer, tmplName, layoutName string, data interface{}) error {
+	//Cuong bổ xung fix theo https://github.com/kataras/blocks/issues/2
+	if layoutName == "" {
+		layoutName = s.Engine.defaultLayoutName
+	}
+
 	if layoutName == view.NoLayout {
 		layoutName = ""
 	}

@@ -1,10 +1,8 @@
 package email
 
 import (
-	"bytes"
 	"fmt"
 
-	"github.com/TechMaster/core/template"
 	"github.com/TechMaster/eris"
 	"github.com/goccy/go-json"
 	"github.com/spf13/viper"
@@ -65,16 +63,15 @@ func (rmail RedisMail) SendPlainEmail(to []string, subject string, body string) 
 	return nil
 }
 
-func (rmail RedisMail) SendHTMLEmail(to []string, subject string, tmplFile string, data map[string]interface{}) error {
-	viewEngine := template.ViewEngine
-	buf := new(bytes.Buffer)
-	if err := viewEngine.ExecuteWriter(buf, tmplFile, "", data); err != nil {
-		return eris.NewFromMsg(err, "Lỗi generate mail body")
+func (rmail RedisMail) SendHTMLEmail(to []string, subject string, data map[string]interface{}, tmpl_layout ...string) error {
+	body, err := renderHTML(data, tmpl_layout...)
+	if err != nil {
+		return err
 	}
 
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 	subjectStr := "Subject: " + subject + "!\n"
-	msg := []byte(subjectStr + mime + "\n" + buf.String())
+	msg := []byte(subjectStr + mime + "\n" + body)
 
 	payload, err := json.Marshal(EmailPayload{
 		To:      to,

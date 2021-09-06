@@ -1,5 +1,42 @@
 # Những thay đổi
 
+### 0.1.29 : 6/9/2021
+
+Thay đổi trong [blocks/engine.go](../blocks/engine.go)
+```go
+func (s *BlocksEngine) ExecuteWriter(w io.Writer, tmplName, layoutName string, data interface{}) error {
+	if layoutName == "" {  //Nếu tham số rỗng, thì dùng defaultLayoutName
+		layoutName = s.Engine.defaultLayoutName
+	}
+
+	if layoutName == view.NoLayout { //Để muốn không dùng layout thì truyền vào iris.nolayout
+		layoutName = ""
+	}
+
+	return s.Engine.ExecuteTemplate(w, tmplName, layoutName, data)
+}
+```
+Đã bổ xung hàm kiểm thử ở [blocks/block_test.go](../blocks/block_test.go). Chạy debug test từng hàm.
+
+
+Thay đổi hàm  SendHTMLEmail trong package email
+```go
+//Cũ 
+SendHTMLEmail(to []string, subject string, tmplFile string, data map[string]interface{}) error
+
+//Mới
+SendHTMLEmail(to []string, subject string, data map[string]interface{}, tmpl_layout ...string) error
+```
+Tham số variadic `tmpl_layout` có tối thiểu một tham số template, tham số thứ 2 là layout.
+Nếu không truyền vào layout thì sẽ lấy `defaultEmailLayout` được cấu hình qua hàm
+
+```go
+func SetDefaultEmailLayout(defaultLayout string) {
+	defaultEmailLayout = defaultLayout
+}
+```
+
+
 ### 0.1.28
 Bổ xung tính năng gửi email sử dụng Asynq và Redis Stream
 Xem file [redis_mail.go](../email/redis_mail.go)

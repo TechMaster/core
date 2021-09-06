@@ -1,11 +1,9 @@
 package email
 
 import (
-	"bytes"
 	"fmt"
 	"net/smtp"
 
-	"github.com/TechMaster/core/template"
 	"github.com/TechMaster/eris"
 )
 
@@ -35,18 +33,17 @@ func (gmail GmailSTMP) SendPlainEmail(to []string, subject string, body string) 
 	return nil
 }
 
-func (gmail GmailSTMP) SendHTMLEmail(to []string, subject string, tmplFile string, data map[string]interface{}) error {
+func (gmail GmailSTMP) SendHTMLEmail(to []string, subject string, data map[string]interface{}, tmpl_layout ...string) error {
 	emailAuth := smtp.PlainAuth("me", gmail.config.From, gmail.config.Password, gmail.config.Host)
 
-	viewEngine := template.ViewEngine
-	buf := new(bytes.Buffer)
-	if err := viewEngine.ExecuteWriter(buf, tmplFile, "", data); err != nil {
-		return eris.NewFromMsg(err, "Lỗi generate mail body")
+	body, err := renderHTML(data, tmpl_layout...)
+	if err != nil {
+		return err
 	}
 
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 	subjectStr := "Subject: " + subject + "!\n"
-	msg := []byte(subjectStr + mime + "\n" + buf.String())
+	msg := []byte(subjectStr + mime + "\n" + body)
 	addr := fmt.Sprintf("%s:%d", gmail.config.Host, gmail.config.Port)
 
 	if err := smtp.SendMail(addr, emailAuth, gmail.config.From, to, msg); err != nil {
