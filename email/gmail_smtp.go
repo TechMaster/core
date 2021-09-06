@@ -7,6 +7,7 @@ import (
 
 	"github.com/TechMaster/core/template"
 	"github.com/TechMaster/eris"
+	"github.com/kataras/iris/v12"
 )
 
 type GmailSTMP struct {
@@ -40,7 +41,7 @@ func (gmail GmailSTMP) SendHTMLEmail(to []string, subject string, tmplFile strin
 
 	viewEngine := template.ViewEngine
 	buf := new(bytes.Buffer)
-	if err := viewEngine.ExecuteWriter(buf, tmplFile, "", data); err != nil {
+	if err := viewEngine.ExecuteWriter(buf, tmplFile, iris.NoLayout, data); err != nil {
 		return eris.NewFromMsg(err, "Lỗi generate mail body")
 	}
 

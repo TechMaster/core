@@ -7,6 +7,7 @@ import (
 	"github.com/TechMaster/core/template"
 	"github.com/TechMaster/eris"
 	"github.com/goccy/go-json"
+	"github.com/kataras/iris/v12"
 	"github.com/spf13/viper"
 
 	"github.com/hibiken/asynq"
@@ -68,7 +69,7 @@ func (rmail RedisMail) SendPlainEmail(to []string, subject string, body string) 
 func (rmail RedisMail) SendHTMLEmail(to []string, subject string, tmplFile string, data map[string]interface{}) error {
 	viewEngine := template.ViewEngine
 	buf := new(bytes.Buffer)
-	if err := viewEngine.ExecuteWriter(buf, tmplFile, "", data); err != nil {
+	if err := viewEngine.ExecuteWriter(buf, tmplFile, iris.NoLayout, data); err != nil {
 		return eris.NewFromMsg(err, "Lỗi generate mail body")
 	}
 
