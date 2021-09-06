@@ -1,6 +1,6 @@
 # Những thay đổi
 
-### 0.1.29 : 6/9/2021
+### 0.1.30 : 6/9/2021
 
 Thay đổi trong [blocks/engine.go](../blocks/engine.go)
 ```go
