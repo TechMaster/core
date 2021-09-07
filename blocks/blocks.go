@@ -455,11 +455,6 @@ func (v *Blocks) ExecuteTemplate(w io.Writer, tmplName, layoutName string, data 
 			return err
 		}
 	}
-	//Cường bổ xung fix theo https://github.com/kataras/blocks/issues/2
-	if layoutName == "" {
-		layoutName = v.defaultLayoutName
-	}
-
 	return v.executeTemplate(w, tmplName, layoutName, data)
 }
 
