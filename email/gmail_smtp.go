@@ -41,7 +41,8 @@ func (gmail GmailSTMP) SendHTMLEmail(to []string, subject string, tmplFile strin
 
 	viewEngine := template.ViewEngine
 	buf := new(bytes.Buffer)
-	if err := viewEngine.ExecuteWriter(buf, tmplFile, iris.NoLayout, data); err != nil {
+	//hoặc iris.NoLayout hoặc "" kết quả như nhau
+	if err := viewEngine.ExecuteWriter(buf, tmplFile, iris.NoLayout, data); err != nil { 
 		return eris.NewFromMsg(err, "Lỗi generate mail body")
 	}
 
