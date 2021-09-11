@@ -28,7 +28,7 @@ var asynqClient *asynq.Client
 func InitRedisMail() *asynq.Client {
 	asynqClient = asynq.NewClient(asynq.RedisClientOpt{
 		Network:  viper.GetString("redis.network"),
-		Addr:     viper.GetString("redis.address"),
+		Addr:     viper.GetString("redis.addr"),
 		Password: viper.GetString("redis.password"),
 		DB:       1, //Do not use 0 because
 	})
