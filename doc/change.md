@@ -18,6 +18,32 @@ func (s *BlocksEngine) ExecuteWriter(w io.Writer, tmplName, layoutName string, d
 ```
 Đã bổ xung hàm kiểm thử ở [blocks/block_test.go](../blocks/block_test.go). Chạy debug test từng hàm.
 
+Có mấy trường hợp:
+
+1. Sử dụng default layout
+Default layout sẽ là file [views/layouts/default.html](../views/layouts/default.html)
+```go
+template.InitBlockEngine(app, "./views", "default")
+```
+
+Trong các handler
+```go
+ctx.View("template")  //Hàm này sẽ default layout
+```
+
+2. Sử dụng custom layout
+Trong thư mục /views/layouts phải có file custom_layout.html
+```go
+ctx.ViewLayout("custom_layout")
+ctx.View("template")
+```
+
+3. Hoàn toàn không dùng layout
+```go
+ctx.ViewLayout(view.NoLayout)
+ctx.View("template")
+```
+
 
 Thay đổi hàm  SendHTMLEmail trong package email
 ```go

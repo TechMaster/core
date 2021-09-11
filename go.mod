@@ -7,6 +7,7 @@ require (
 	github.com/TechMaster/eris v0.1.10
 	github.com/brianvoe/gofakeit/v6 v6.7.1
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/didip/tollbooth/v6 v6.1.1
 	github.com/go-pg/pg/v10 v10.10.3
 	github.com/go-redis/redis/v7 v7.4.1 // indirect
 	github.com/go-redis/redis/v8 v8.11.3

@@ -24,7 +24,7 @@ func init() {
 }
 
 func CreateNewUser(fullName string, password string, email string, phone string, roles ...int) {
-	hassedpass, _ := pass.HashBcryptPass(password)
+	hassedpass := pass.HashPassword(password)
 	id, _ := gonanoid.New(8)
 	user := pmodel.User{
 		Id:       id,

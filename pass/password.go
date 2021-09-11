@@ -4,16 +4,33 @@ import (
 	"crypto/sha1"
 
 	p "github.com/wuriyanto48/go-pbkdf2"
-	"golang.org/x/crypto/bcrypt"
 )
 
 /*
-Bcrypt băm password rất chậm, tuy nhiên mỗi lần băm, cùng một chuỗi sẽ cho ra kết quả khác nhau
-Tránh lỗ hổng bảo mật khi hacker truy theo rainbow table, bảng những password băm sẵn
+Tạo interface cho các thư viện băm password tuân thủ
 */
-func HashBcryptPass(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 3)
-	return string(bytes), err
+type PasswordLib interface {
+	Hash(password string) (hash string)
+	Compare(password string, hashpass string) bool
+}
+
+var PassLib PasswordLib
+
+func init() {
+	PassLib = Argon2id{ //Chọn Argon2id làm thư viện băm password, trong tương lai có thể thay đổi
+		params: Params{
+			Memory:      64 * 1024,
+			Iterations:  1,
+			Parallelism: 2,
+			SaltLength:  16,
+			KeyLength:   32,
+		},
+	}
+}
+
+//Sử dụng thuật toán băm Argon2Id
+func HashPassword(inputpass string) string {
+	return PassLib.Hash(inputpass)
 }
 
 /*
@@ -27,7 +44,6 @@ func CheckPassword(inputpass string, hashedpass string, salt string) bool {
 		pass := p.NewPassword(sha1.New, 50, 64, 10000)
 		return pass.VerifyPassword(inputpass, hashedpass, salt) //Sửa theo yêu cầu Nhật Đức
 	} else {
-		err := bcrypt.CompareHashAndPassword([]byte(hashedpass), []byte(inputpass))
-		return err == nil
+		return PassLib.Compare(inputpass, hashedpass)
 	}
 }
