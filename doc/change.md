@@ -1,4 +1,29 @@
 # Những thay đổi
+
+### 0.1.33: 11/9/2021
+
+**Bổ xung package** [ratelimit.go](../ratelimit/ratelimit.go) giới hạn số request xử lý trong một giây
+Xem ví dụ ở [router/base.go](../router/base.go)
+```go
+import (
+	"github.com/TechMaster/core/ratelimit"
+	"github.com/didip/tollbooth/v6"
+)
+
+func RegisterRoute(app *iris.Application) {
+	limiter := tollbooth.NewLimiter(1, nil) //Tối đa 1 request trong 1 giây
+	app.Post("/login", ratelimit.LimitHandler(limiter), controller.Login)  //áp dụng với POST /login
+}
+```
+
+**Sửa đổi package** [pass](../pass/password.go): thay thế hàm băm password từ BCrypt thành [Argon2id](https://pkg.go.dev/golang.org/x/crypto/argon2#hdr-Argon2id)
+
+Hãy dùng 2 hàm chính là
+```go
+func HashPassword(inputpass string) string
+func CheckPassword(inputpass string, hashedpass string, salt string) bool
+```
+
 ### 0.1.32: 7/9/2021
 Thay đổi trong [session/session.go](../session/session.go)
 ```go
