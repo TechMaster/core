@@ -1,4 +1,29 @@
 # Những thay đổi
+
+### 0.1.33: 11/9/2021
+
+**Bổ xung package** [ratelimit.go](../ratelimit/ratelimit.go) giới hạn số request xử lý trong một giây
+Xem ví dụ ở [router/base.go](../router/base.go)
+```go
+import (
+	"github.com/TechMaster/core/ratelimit"
+	"github.com/didip/tollbooth/v6"
+)
+
+func RegisterRoute(app *iris.Application) {
+	limiter := tollbooth.NewLimiter(1, nil) //Tối đa 1 request trong 1 giây
+	app.Post("/login", ratelimit.LimitHandler(limiter), controller.Login)  //áp dụng với POST /login
+}
+```
+
+**Sửa đổi package** [pass](../pass/password.go): thay thế hàm băm password từ BCrypt thành [Argon2id](https://pkg.go.dev/golang.org/x/crypto/argon2#hdr-Argon2id)
+
+Hãy dùng 2 hàm chính là
+```go
+func HashPassword(inputpass string) string
+func CheckPassword(inputpass string, hashedpass string, salt string) bool
+```
+
 ### 0.1.32: 7/9/2021
 Thay đổi trong [session/session.go](../session/session.go)
 ```go
@@ -44,6 +69,32 @@ func (s *BlocksEngine) ExecuteWriter(w io.Writer, tmplName, layoutName string, d
 }
 ```
 Đã bổ xung hàm kiểm thử ở [blocks/block_test.go](../blocks/block_test.go). Chạy debug test từng hàm.
+
+Có mấy trường hợp:
+
+1. Sử dụng default layout
+Default layout sẽ là file [views/layouts/default.html](../views/layouts/default.html)
+```go
+template.InitBlockEngine(app, "./views", "default")
+```
+
+Trong các handler
+```go
+ctx.View("template")  //Hàm này sẽ default layout
+```
+
+2. Sử dụng custom layout
+Trong thư mục /views/layouts phải có file custom_layout.html
+```go
+ctx.ViewLayout("custom_layout")
+ctx.View("template")
+```
+
+3. Hoàn toàn không dùng layout
+```go
+ctx.ViewLayout(view.NoLayout)
+ctx.View("template")
+```
 
 
 Thay đổi hàm  SendHTMLEmail trong package email

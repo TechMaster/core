@@ -491,16 +491,25 @@ Xem [redis_mail.go](email/redis_mail.go)
 
 ## 12. pass các hàm băm password
 Tuyệt đối không được lưu secret key hay các chuỗi nhạy cảm vào đây. Xem chi tiết [pass/password.go](pass/password.go)
-
-Băm password bằng thư viện Bcrypt
+Tạo ra một interface chung cho tất cả các thư viện băm password tuân thủ
 ```go
-func HashBcryptPass(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
+type PasswordLib interface {
+	Hash(password string) (hash string)
+	Compare(password string, hashpass string) bool
 }
 ```
 
-Kiểm tra password
+Hiện tại dùng thư viện [Argon2id](https://pkg.go.dev/golang.org/x/crypto/argon2) là thư viện password tốt nhất hiện nay
+
+### 12.1 Băm password
+
+```go
+func HashPassword(inputpass string) string {
+	return PassLib.Hash(inputpass)
+}
+```
+
+### 12.2 Kiểm tra password
 ```go
 /*
 Hàm check password hỗ trợ cả kiểu SHA1 cũ và bcrypt mới
@@ -511,14 +520,27 @@ Hàm check password hỗ trợ cả kiểu SHA1 cũ và bcrypt mới
 func CheckPassword(inputpass string, hashedpass string, salt string) bool {
 	if salt != "" {
 		pass := p.NewPassword(sha1.New, 50, 64, 10000)
-		return pass.VerifyPassword(inputpass, hashedpass, hashedpass)
+		return pass.VerifyPassword(inputpass, hashedpass, salt) //Sửa theo yêu cầu Nhật Đức
 	} else {
-		err := bcrypt.CompareHashAndPassword([]byte(hashedpass), []byte(inputpass))
-		return err == nil
+		return PassLib.Compare(inputpass, hashedpass)
 	}
 }
 ```
 
+## 13. Rate Limit
+Sử dụng `github.com/didip/tollbooth/v6`. Tolbooth là middleware để giới hạn số lượng http request đến trong một khoảng thời gian. Cấu hình trong router như sau:
+
+```go
+import (
+	"github.com/TechMaster/core/ratelimit"
+	"github.com/didip/tollbooth/v6"
+)
+
+func RegisterRoute(app *iris.Application) {
+	limiter := tollbooth.NewLimiter(1, nil) //Tối đa 1 request trong 1 giây
+	app.Post("/login", ratelimit.LimitHandler(limiter), controller.Login)  //áp dụng với POST /login
+}
+```
 
 ## Để phát hành phiên bản mới module này cần làm những bước sau
 Thay v0.1.3 bằng phiên bản thực tế
