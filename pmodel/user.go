@@ -35,9 +35,10 @@ Giống hệt User nhưng loại bỏ trường HashPass
 Cấu trúc này sẽ lưu vào session
 */
 type AuthenInfo struct {
-	Id       string //unique id của user
-	FullName string //họ và tên đầy đủ của user
-	Email    string //email cũng phải unique
-	Avatar   string //unique id hoặc tên file ảnh đại diện
-	Roles    Roles  //kiểu map[int]bool. Cần phải chuyển đổi Roles []int32 `pg:",array"` sang
+	UserId       string //unique id của user
+	UserFullName string //họ và tên đầy đủ của user
+	UserEmail    string //email cũng phải unique
+	UserAvatar  string //unique id hoặc tên file ảnh đại diện
+	UserPhone	string
+	Roles        Roles  //kiểu map[int]bool. Cần phải chuyển đổi Roles []int32 `pg:",array"` sang
 }

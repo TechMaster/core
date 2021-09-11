@@ -41,9 +41,9 @@ func Login(ctx iris.Context) {
 	}
 
 	_ = session.SetAuthenticated(ctx, pmodel.AuthenInfo{
-		Id:       user.Id,
-		FullName: user.FullName,
-		Email:    user.Email,
+		UserId:       user.Id,
+		UserFullName: user.FullName,
+		UserEmail:    user.Email,
 		Roles:    pmodel.IntArrToRoles(user.Roles), //Chuyển từ mảng []int sang map[int]bool
 	})
 

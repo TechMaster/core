@@ -1,4 +1,31 @@
 # Những thay đổi
+### 0.1.32: 7/9/2021
+Thay đổi trong [session/session.go](../session/session.go)
+```go
+const (
+	SESSION_COOKIE = "mycookiesession"
+	SESS_USER      = "authenticate"
+	AUTHINFO       = "authinfo"
+)
+
+//Các biến dùng chung trong packge
+var Sess *sessions.Sessions         //Cấu hình Session Manager
+var redisDB *redis_session.Database //Đây là một wrapper nối xuống Redis của Iris
+var redisClient *redis.Client       //Đây là redis client trực tiếp nối xuống Redis db không qua Iris
+var expires = time.Hour * 720         //Thời gian mà 1 session sẽ hết hạn và bị xoá khỏi Redis
+```
+Thay đổi trong [pmodel/user.go](../pmodel/user.go)
+```go
+type AuthenInfo struct {
+	UserId       string //unique id của user
+	UserFullName string //họ và tên đầy đủ của user
+	UserEmail    string //email cũng phải unique
+	UserAvatar  string //unique id hoặc tên file ảnh đại diện
+	UserPhone	string
+	Roles        Roles  //kiểu map[int]bool. Cần phải chuyển đổi Roles []int32 `pg:",array"` sang
+}
+```
+Và một số thay đổi khác nữa trong controller do tên field AuthenInfo thay đổi
 
 ### 0.1.30 : 6/9/2021
 
