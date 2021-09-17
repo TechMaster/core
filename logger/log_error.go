@@ -1,7 +1,9 @@
 package logger
 
 import (
+	"errors"
 	"fmt"
+	"syscall"
 
 	"github.com/TechMaster/eris"
 
@@ -44,9 +46,11 @@ func Log(ctx iris.Context, err error) {
 			}
 		}
 		_ = ctx.View(LogConf.ErrorTemplate)
-		return
-
+		return		
 	default: //Lỗi thông thường
+		if errors.Is(err, syscall.EPIPE){
+			return
+		}
 		fmt.Println(err.Error()) //In ra console
 		if shouldReturnJSON {    //Trả về JSON
 			ctx.StatusCode(iris.StatusInternalServerError)

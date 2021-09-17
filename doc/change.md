@@ -1,5 +1,12 @@
 # Những thay đổi
-
+### 0.1.34: 17/9/2021
+Bổ sung thêm trường hợp nếu lỗi là broken pipe thì ignore nó đi, không ghi ra console để tránh log lỗi không cần thiết quá nhiều. Tham khảo về lỗi broken pipe [tại đây](https://noknow.info/it/go/handling_error_broken_pipe?lang=en).
+```go
+if errors.Is(err, syscall.EPIPE){
+	return
+}
+```
+File bổ sung thêm code [ở đây](../logger/log_error.go)
 ### 0.1.33: 11/9/2021
 
 **Bổ xung package** [ratelimit.go](../ratelimit/ratelimit.go) giới hạn số request xử lý trong một giây
