@@ -1,6 +1,6 @@
 # Những thay đổi
 
-### 0.1.36: 17/9/2021
+### 0.1.37: 17/9/2021
 Cường: cập nhật package [config](../config/config.go) để có thể đọc được thông tin nhạy cảm trong Docker Secret khi triển khai lên Docker Swarm.
 
 Hàm `func ParseViperSettings()` trong  [config](../config/config.go) sẽ đọc toàn bộ thông tin cấu hình sau khi viper đọc xong từ file cấu hình sau đó tìm đến những trường dùng Docker Secret để đọc giá trị thực trong file trong thư mục chuyên lưu Docker secret `/run/secrets`
