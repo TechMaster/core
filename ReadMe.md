@@ -133,6 +133,33 @@ func IsAppInDebugMode() bool {
 	return false
 }
 ```
+
+### 3.1 Hỗ trợ đọc Docker Secret
+Docker Secret là một tính năng trong Docker Swarm dùng để lưu thông tin nhạy cảm như password. Như vậy bạn sẽ không để lộ password trong file cấu hình hay file docker-compose.yml.
+
+```yaml
+version: "3.8"
+
+secrets:
+  pgpass: # Khai báo import pgpass từ bên ngoài
+    external: true
+
+services:
+  whoami:
+    image: main
+    secrets:
+      - pgpass  # Sử dụng trong dịch vụ này
+```
+
+Tiếp đến cấu hình file configure, đánh dấu key `pgpass` bởi string `@@pgpass`. **Nhớ phải có `@@` trước tên secret key **để package config khi đọc sẽ tìm đến file ở thư mục /run/secrets đọc nội dung thực của secret
+```json
+{
+	"database": {
+			"user": "root",
+			"pgpass": "@@pgpass", 
+```
+
+
 ## 4. Logger
 **Chú ý: nếu đã dùng module github.com/TechMaster/core thì buộc phải dùng cả github.com/TechMaster/core/logger. Tuyệt đối không dùng github.com/TechMaster/logger !**
 

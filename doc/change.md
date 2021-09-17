@@ -1,4 +1,36 @@
 # Những thay đổi
+
+### 0.1.36: 17/9/2021
+Cường: cập nhật package [config](../config/config.go) để có thể đọc được thông tin nhạy cảm trong Docker Secret khi triển khai lên Docker Swarm.
+
+Hàm `func ParseViperSettings()` trong  [config](../config/config.go) sẽ đọc toàn bộ thông tin cấu hình sau khi viper đọc xong từ file cấu hình sau đó tìm đến những trường dùng Docker Secret để đọc giá trị thực trong file trong thư mục chuyên lưu Docker secret `/run/secrets`
+
+Trong file cấu hình `config.product.json` key nào cần đọc Docker Secret hãy khai báo như sau:
+
+```json
+"password": "@@pg_password", 
+```
+
+Phần giá trị của string **bổ xung 2 ký tự `@@`** làm chỉ dấu để [config](../config/config.go) khi đọc tới, tiếp tục đọc file lưu trong thư mục `/run/secrets`. Các mẫu giá trị Docker Secret được ghi vào từng file trong thư mục `/run/secrets` khi container khởi động.
+
+Ngoài ra phải cấu hình service trong docker-compose.yml để service dùng cụ thể Docker secret nào
+```yaml
+version: "3.8"
+
+secrets:
+  pg_password: # Khai báo import pg_password từ bên ngoài
+    external: true
+
+services:
+  whoami:
+    image: main
+    secrets:
+      - pg_password  # Sử dụng trong dịch vụ này
+```
+
+
+
+
 ### 0.1.34: 17/9/2021
 Bổ sung thêm trường hợp nếu lỗi là broken pipe thì ignore nó đi, không ghi ra console để tránh log lỗi không cần thiết quá nhiều. Tham khảo về lỗi broken pipe [tại đây](https://noknow.info/it/go/handling_error_broken_pipe?lang=en).
 ```go
