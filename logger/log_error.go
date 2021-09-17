@@ -13,6 +13,9 @@ import (
 
 // Chuyên xử lý các err mà controller trả về
 func Log(ctx iris.Context, err error) {
+	if errors.Is(err, syscall.EPIPE){
+		return
+	}
 	//Trả về JSON error khi client gọi lên bằng AJAX hoặc request.ContentType dạng application/json
 	shouldReturnJSON := ctx.IsAjax() || ctx.GetContentTypeRequested() == "application/json"
 	switch e := err.(type) {
@@ -48,9 +51,6 @@ func Log(ctx iris.Context, err error) {
 		_ = ctx.View(LogConf.ErrorTemplate)
 		return		
 	default: //Lỗi thông thường
-		if errors.Is(err, syscall.EPIPE){
-			return
-		}
 		fmt.Println(err.Error()) //In ra console
 		if shouldReturnJSON {    //Trả về JSON
 			ctx.StatusCode(iris.StatusInternalServerError)
