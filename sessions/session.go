@@ -63,6 +63,10 @@ func (s *Session) Get(key string) interface{} {
 	return s.provider.db.Get(s.sid, key)
 }
 
+func (s *Session) GetByToken(key string, token string) interface{} {
+	return s.provider.db.Get(token, key)
+}
+
 // Decode binds the given "outPtr" to the value associated to the provided "key".
 func (s *Session) Decode(key string, outPtr interface{}) error {
 	return s.provider.db.Decode(s.sid, key, outPtr)

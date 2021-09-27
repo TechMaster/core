@@ -12,7 +12,11 @@ import (
 Lấy thông tin đăng nhập của người dùng từ Redis Session
 */
 func GetAuthInfoSession(ctx iris.Context) (authinfo *pmodel.AuthenInfo) {
-	data := sessions.Get(ctx).Get(SESS_USER)
+	sessid := ctx.GetHeader("token")
+	if sessid == "" {
+		return nil
+	}
+	data := sessions.Get(ctx).GetByToken(SESS_USER, sessid)
 	if data == nil {
 		return nil
 	}
