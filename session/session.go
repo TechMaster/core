@@ -18,7 +18,7 @@ const (
 //Các biến dùng chung trong packge
 var Sess *sessions.Sessions         //Cấu hình Session Manager
 var redisDB *redis_session.Database //Đây là một wrapper nối xuống Redis của Iris
-var redisClient *redis.Client       //Đây là redis client trực tiếp nối xuống Redis db không qua Iris
+var RedisClient *redis.Client       //Đây là redis client trực tiếp nối xuống Redis db không qua Iris
 var expires = time.Hour * 720         //Thời gian mà 1 session sẽ hết hạn và bị xoá khỏi Redis
 
 /* Khởi tạo In Memory Session, không kết nối vào Redis hay bất kỳ CSDL nào
@@ -51,7 +51,7 @@ func InitRedisSession() *redis_session.Database {
 
 	Sess.UseDatabase(redisDB)
 
-	redisClient = redis.NewClient(&redis.Options{
+	RedisClient = redis.NewClient(&redis.Options{
 		Network:  viper.GetString("redis.network"),
 		Addr:     viper.GetString("redis.addr"),
 		Password: viper.GetString("redis.password"),

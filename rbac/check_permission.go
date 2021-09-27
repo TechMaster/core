@@ -15,7 +15,7 @@ func CheckRoutePermission(ctx iris.Context) {
 	authinfo := session.GetAuthInfoSession(ctx)
 
 	//Nếu route không thuộc nhóm public routes cần kiểm tra phân quyền
-	if authinfo != nil {
+	if authinfo != nil && ctx.GetContentType() == "text/html"{
 		//Gán authinfo để cho handler phía sau dùng
 		ctx.ViewData(session.AUTHINFO, authinfo)
 	}

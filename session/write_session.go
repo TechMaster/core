@@ -21,11 +21,11 @@ func SetAuthenticated(ctx iris.Context, authenInfo pmodel.AuthenInfo) error {
 	Ứng với userID sẽ có một Set các sessionID
 	*/
 	bgCtx := context.Background()
-	_, err := redisClient.SAdd(bgCtx, authenInfo.UserId, sess.ID()).Result()
+	_, err := RedisClient.SAdd(bgCtx, authenInfo.UserId, sess.ID()).Result()
 	if err != nil {
 		return err
 	}
-	redisClient.Expire(bgCtx, authenInfo.UserId, expires) //Đặt thời điểm hết hạn cho bản ghi này
+	RedisClient.Expire(bgCtx, authenInfo.UserId, expires) //Đặt thời điểm hết hạn cho bản ghi này
 	return nil
 }
 
@@ -46,11 +46,11 @@ func Logout(ctx iris.Context) error {
 	sess := sessions.Get(ctx)
 	bgCtx := context.Background()
 	sessionID := sess.ID()
-	redisClient.Del(bgCtx, sessionID) //Xoá sessionID thực sự
+	RedisClient.Del(bgCtx, sessionID) //Xoá sessionID thực sự
 
 	if authenInfo != nil {
 		//Loại bớt một phần tử trong tập một user.Id chứa nhiều session id của một user
-		_, err := redisClient.SRem(bgCtx, authenInfo.UserId, sessionID).Result()
+		_, err := RedisClient.SRem(bgCtx, authenInfo.UserId, sessionID).Result()
 		if err != nil {
 			return err
 		}

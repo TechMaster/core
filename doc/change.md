@@ -1,5 +1,9 @@
 # Những thay đổi
 
+### 0.1.39: 27/9/2021
+Đức [cập nhật GetAuthInfo](../session/query_session.go) đọc SessId từ Header Request để bên frontend có thể lấy được userinfo.
+Ngoài ra thay đổi biến redisClient thành biến public RedisClient để ở student có thể lấy được biến này.
+
 ### 0.1.37: 17/9/2021
 Cường: cập nhật package [config](../config/config.go) để có thể đọc được thông tin nhạy cảm trong Docker Secret khi triển khai lên Docker Swarm.
 

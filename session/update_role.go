@@ -22,7 +22,7 @@ import (
 //Hàm này chỉ được chạy bởi Admin
 func UpdateRole(userID string, roles []int) error {
 	bgCtx := context.Background()
-	arrSessID, err := redisClient.SMembers(bgCtx, userID).Result()
+	arrSessID, err := RedisClient.SMembers(bgCtx, userID).Result()
 
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func UpdateRole(userID string, roles []int) error {
 
 	//Cập nhật lại AuthInfo
 	for _, sessid := range arrSessID {
-		str, err := redisClient.HGet(bgCtx, sessid, SESS_USER).Result()
+		str, err := RedisClient.HGet(bgCtx, sessid, SESS_USER).Result()
 		if err != nil {
 			return err
 		}
@@ -47,7 +47,7 @@ func UpdateRole(userID string, roles []int) error {
 		if err != nil {
 			return err
 		}
-		redisClient.HSet(bgCtx, sessid, SESS_USER, string(data))
+		RedisClient.HSet(bgCtx, sessid, SESS_USER, string(data))
 
 	}
 	return nil
