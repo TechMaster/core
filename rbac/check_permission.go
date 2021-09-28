@@ -3,6 +3,7 @@ package rbac
 import (
 	"github.com/TechMaster/core/pmodel"
 	"github.com/TechMaster/core/session"
+	"github.com/TechMaster/core/template"
 
 	"github.com/TechMaster/core/logger"
 	"github.com/TechMaster/eris"
@@ -15,7 +16,7 @@ func CheckRoutePermission(ctx iris.Context) {
 	authinfo := session.GetAuthInfoSession(ctx)
 
 	//Nếu route không thuộc nhóm public routes cần kiểm tra phân quyền
-	if authinfo != nil && ctx.GetContentType() == "text/html"{
+	if authinfo != nil && template.BlockEngine != nil{
 		//Gán authinfo để cho handler phía sau dùng
 		ctx.ViewData(session.AUTHINFO, authinfo)
 	}
