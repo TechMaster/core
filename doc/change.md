@@ -1,5 +1,8 @@
 # Những thay đổi
 
+### 0.1.40: 28/9/2021
+- Bổ sung thêm nếu template engine khác nil thì mới Set viewdata authinfo ở hàm `CheckPermission` rbac.
+
 ### 0.1.39: 27/9/2021
 Đức [cập nhật GetAuthInfo](../session/query_session.go) đọc SessId từ Header Request để bên frontend có thể lấy được userinfo.
 Ngoài ra thay đổi biến redisClient thành biến public RedisClient để ở student có thể lấy được biến này.
