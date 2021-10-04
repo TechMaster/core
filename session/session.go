@@ -29,6 +29,7 @@ func init() {
 		Cookie:       SESSION_COOKIE,
 		AllowReclaim: true,
 		Expires:      expires,
+		CookieSecureTLS: true,
 	})
 }
 
