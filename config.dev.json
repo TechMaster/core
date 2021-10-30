@@ -26,6 +26,6 @@
         "Host": "smtp.gmail.com",
         "From": "xyz@gmail.com",
         "Password": "abc123",
-        "Port": 587    
+        "Port": 587
     }
 }

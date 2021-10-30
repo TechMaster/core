@@ -1,21 +1,18 @@
 {{ if .authinfo }}
-<h1>Welcome {{ .authinfo.FullName }}</h1>
+<h1>Welcome {{ .authinfo.UserFullName }}</h1>
 <ul>
-  {{range .roles}}
-  <li>{{.}}</li>
-  {{end}}
+    {{range .roles}}
+    <li>{{.}}</li>
+    {{end}}
 </ul>
 
 <a href="/secret">Go to Secret Page</a><br>
 <a href="/logout">Logout</a><br>
-<a href="/changerole">Change Role</a>
-
-{{ else }}
+<a href="/changerole">Change Role</a> {{ else }}
 <h1>Please Login</h1>
 <form action="/login" method="post">
-  User : <input type="text" name="Email"> <br>
-  Pass : <input type="text" name="Pass"> <br><br>
-  <input type="submit" value="Submit">
+    User : <input type="text" name="Email"> <br> Pass : <input type="text" name="Pass"> <br><br>
+    <input type="submit" value="Submit">
 </form>
 {{ end }}
 <br>
@@ -23,7 +20,7 @@
 <br>
 <h2>Danh sách user</h2>
 <ul>
-  {{range .users}}
-  <li>{{.FullName}} - {{.Email}} - {{.Roles}}</li>
-  {{end}}
+    {{range .users}}
+    <li>{{.UserFullName}} - {{.UserEmail}} - {{.UserRoles}}</li>
+    {{end}}
 </ul>
