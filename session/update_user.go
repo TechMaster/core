@@ -20,35 +20,22 @@ import (
 */
 
 //Hàm này chỉ được chạy bởi Admin
-func UpdateRole(userID string, roles []int) error {
+//columns[0]: full_name, columns[1]: email, columns[2]:phone, colums[3]: avatar
+func UpdateUserInfo(userID string, authinfo *pmodel.AuthenInfo) error {
 	bgCtx := context.Background()
 	arrSessID, err := RedisClient.SMembers(bgCtx, userID).Result()
-
 	if err != nil {
 		return err
 	}
 
 	//Cập nhật lại AuthInfo
 	for _, sessid := range arrSessID {
-		str, err := RedisClient.HGet(bgCtx, sessid, SESS_USER).Result()
-		if err != nil {
-			return err
-		}
-
-		var authInfo pmodel.AuthenInfo
-		err = json.Unmarshal([]byte(str), &authInfo)
-		if err != nil {
-			return err
-		}
-		authInfo.Roles = pmodel.IntArrToRoles(roles)
-
 		var data []byte
-		data, err = json.Marshal(authInfo)
+		data, err = json.Marshal(authinfo)
 		if err != nil {
 			return err
 		}
 		RedisClient.HSet(bgCtx, sessid, SESS_USER, string(data))
-
 	}
 	return nil
 }

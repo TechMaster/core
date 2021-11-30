@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/TechMaster/core/logger"
+	"github.com/TechMaster/core/pmodel"
 	"github.com/TechMaster/core/repo"
 	"github.com/TechMaster/core/session"
 	"github.com/TechMaster/eris"
@@ -45,9 +46,11 @@ func ChangeRole(ctx iris.Context) {
 	//Cập nhật vào database
 	user.Roles = roles
 	repo.UpSertUser(user) //Cập nhật role trong repo
+	authinfo := session.GetAuthInfo(ctx)
+	authinfo.Roles = pmodel.IntArrToRoles(roles)
 
 	//Cập nhật vào Redis Session
-	err = session.UpdateRole(user.Id, roles)
+	err = session.UpdateUserInfo(user.Id, authinfo)
 	if err != nil {
 		logger.Log(ctx, eris.NewFromMsg(err, "Failed to update role"))
 		return

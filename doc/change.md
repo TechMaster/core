@@ -1,5 +1,8 @@
 # Những thay đổi
 
+### 0.1.42: 30/11/2021
+- Đức thay đổi `UpdateRole` thành `UpdateUserInfo`, từ giờ khi cập nhật propfile hay cập nhật role sẽ đều dùng chung `UpdateUserInfo` này. File thay đổi [ở đây](../session/update_user.go)
+
 ### 0.1.40: 28/9/2021
 - Bổ sung thêm nếu template engine khác nil thì mới Set viewdata authinfo ở hàm `CheckPermission` rbac.
 
