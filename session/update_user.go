@@ -20,7 +20,6 @@ import (
 */
 
 //Hàm này chỉ được chạy bởi Admin
-//columns[0]: full_name, columns[1]: email, columns[2]:phone, colums[3]: avatar
 func UpdateUserInfo(userID string, authinfo *pmodel.AuthenInfo) error {
 	bgCtx := context.Background()
 	arrSessID, err := RedisClient.SMembers(bgCtx, userID).Result()
@@ -28,13 +27,14 @@ func UpdateUserInfo(userID string, authinfo *pmodel.AuthenInfo) error {
 		return err
 	}
 
+	var data []byte
+	data, err = json.Marshal(authinfo)
+	if err != nil {
+		return err
+	}
+
 	//Cập nhật lại AuthInfo
-	for _, sessid := range arrSessID {
-		var data []byte
-		data, err = json.Marshal(authinfo)
-		if err != nil {
-			return err
-		}
+	for _, sessid := range arrSessID {	
 		RedisClient.HSet(bgCtx, sessid, SESS_USER, string(data))
 	}
 	return nil
