@@ -40,7 +40,7 @@ func Test_Send_Email_Marketing(t *testing.T) {
 	template.InitBlockEngine(app, "../views", "default")
 
 	var redis_mail RedisMail
-	err := redis_mail.SendHTMLEmailMarketing("ba@techmaster.vn", "Xuân Ba", "Đức test", "key-5b4c81ac16e61701bfe93305673ee823",
+	err := redis_mail.SendHTMLEmailMarketing("ba@techmaster.vn", "Xuân Ba", "Đức test", "",
 	[]string{"nhatduc@techmaster.vn", "nhatduc.hoanghapaper@gmail.com"}, map[string]interface{}{
 	}, "index")
 	assert := assert.New(t)
