@@ -15,6 +15,7 @@ type MailSender interface {
 
 	//Mới
 	SendHTMLEmail(to []string, subject string, data map[string]interface{}, tmpl_layout ...string) error
+
 }
 
 type SMTPConfig struct {

@@ -12,12 +12,15 @@ import (
 
 const (
 	SEND_EMAIL = "email:send"
+	SEND_EMAIL_MARKETING = "email_marketing:send"
 )
 
 type EmailPayload struct {
+	Sender string
 	To      []string
 	Subject string
 	Msg     []byte
+	PrivateKey string
 }
 
 type RedisMail struct {
@@ -41,7 +44,6 @@ func InitRedisMail() *asynq.Client {
 Implement MailSender interface
 */
 func (rmail RedisMail) SendPlainEmail(to []string, subject string, body string) error {
-
 	mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
 	subjectStr := "Subject: " + subject + "!\n"
 	msg := []byte(subjectStr + mime + "\n" + body)
@@ -83,6 +85,33 @@ func (rmail RedisMail) SendHTMLEmail(to []string, subject string, data map[strin
 	}
 
 	info, err := asynqClient.Enqueue(asynq.NewTask(SEND_EMAIL, payload))
+	if err != nil {
+		return eris.NewFromMsg(err, "Could not enqueue task").InternalServerError()
+	}
+	fmt.Printf("enqueued task: id=%s queue=%s\n", info.ID, info.Queue)
+	return nil
+}
+
+func (rmail RedisMail) SendHTMLEmailMarketing(from, alias_name, subject, privateKey string,
+	to []string, data map[string]interface{}, tmpl_layout ...string) error {
+	
+	body, err := renderHTML(data, tmpl_layout...)
+	if err != nil {
+		return err
+	}
+
+	payload, err := json.Marshal(EmailPayload{
+		Sender: alias_name + " <" + from + ">",
+		To:      to,
+		Subject: subject,
+		Msg:     []byte(body),
+		PrivateKey: privateKey,
+	})
+	if err != nil {
+		return eris.NewFrom(err).InternalServerError()
+	}
+
+	info, err := asynqClient.Enqueue(asynq.NewTask(SEND_EMAIL_MARKETING, payload))
 	if err != nil {
 		return eris.NewFromMsg(err, "Could not enqueue task").InternalServerError()
 	}

@@ -1,5 +1,9 @@
 # Những thay đổi
 
+## 0.1.46: 09/03/2022
+- Bổ sung gửi email marketing. File bổ sung [ở đây](../email/redis_mail.go)
+
+
 ### 0.1.42: 30/11/2021
 - Đức thay đổi `UpdateRole` thành `UpdateUserInfo`, từ giờ khi cập nhật propfile hay cập nhật role sẽ đều dùng chung `UpdateUserInfo` này. File thay đổi [ở đây](../session/update_user.go)
 
