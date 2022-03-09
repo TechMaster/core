@@ -26,6 +26,8 @@ type EmailPayload struct {
 type RedisMail struct {
 }
 
+var Redis_mail RedisMail 
+
 var asynqClient *asynq.Client
 
 func InitRedisMail() *asynq.Client {
