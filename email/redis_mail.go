@@ -109,14 +109,14 @@ func (rmail RedisMail) SendHTMLEmail(to []string, subject string, data map[strin
 }
 
 func (rmail RedisMail) SendHTMLEmailMarketing(from, sender_name, subject string,
-	to []pmodel.AuthenInfo, data string) (err error) {
+	to []pmodel.AuthenInfo, html_content string) (err error) {
 	var emails_payload = MailMarketing{
 		Sender:  sender_name + " <" + from + ">",
 		Subject: subject,
 	}
 
 	var receiversEmail = []ReceiverEmail{}
-	tmpl, err := template.New("name").Parse(data)
+	tmpl, err := template.New("name").Parse(html_content)
 	if err != nil {
 		logger.Log2(eris.NewFrom(err).SetType(eris.SYSERROR))
 	}
