@@ -22,7 +22,7 @@ const (
 type EmailPayload struct {
 	To      []string
 	Subject string
-	Msg     string
+	Msg     []byte
 }
 
 type MailMarketing struct {
@@ -63,7 +63,7 @@ func (rmail RedisMail) SendPlainEmail(to []string, subject string, body string) 
 	payload, err := json.Marshal(EmailPayload{
 		To:      to,
 		Subject: subject,
-		Msg:     body,
+		Msg:     []byte(body),
 	})
 	if err != nil {
 		return eris.NewFrom(err).InternalServerError()
@@ -86,7 +86,7 @@ func (rmail RedisMail) SendHTMLEmail(to []string, subject string, data map[strin
 	payload, err := json.Marshal(EmailPayload{
 		To:      to,
 		Subject: subject,
-		Msg:     body,
+		Msg:     []byte(body),
 	})
 	if err != nil {
 		return eris.NewFrom(err).InternalServerError()
