@@ -20,7 +20,6 @@ const (
 )
 
 type EmailPayload struct {
-	Sender  string
 	To      []string
 	Subject string
 	Msg     string
