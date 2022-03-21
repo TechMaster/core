@@ -23,7 +23,7 @@ type EmailPayload struct {
 	Sender  string
 	To      []string
 	Subject string
-	Msg     []byte
+	Msg     string
 }
 
 type MailMarketing struct {
@@ -60,14 +60,11 @@ func InitRedisMail() *asynq.Client {
 Implement MailSender interface
 */
 func (rmail RedisMail) SendPlainEmail(to []string, subject string, body string) error {
-	mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
-	subjectStr := "Subject: " + subject + "!\n"
-	msg := []byte(subjectStr + mime + "\n" + body)
 
 	payload, err := json.Marshal(EmailPayload{
 		To:      to,
-		Subject: subjectStr,
-		Msg:     msg,
+		Subject: subject,
+		Msg:     body,
 	})
 	if err != nil {
 		return eris.NewFrom(err).InternalServerError()
@@ -87,14 +84,10 @@ func (rmail RedisMail) SendHTMLEmail(to []string, subject string, data map[strin
 		return err
 	}
 
-	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	subjectStr := "Subject: " + subject + "!\n"
-	msg := []byte(subjectStr + mime + "\n" + body)
-
 	payload, err := json.Marshal(EmailPayload{
 		To:      to,
-		Subject: subjectStr,
-		Msg:     msg,
+		Subject: subject,
+		Msg:     body,
 	})
 	if err != nil {
 		return eris.NewFrom(err).InternalServerError()
