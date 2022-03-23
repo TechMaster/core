@@ -5,6 +5,8 @@ import (
 
 	"github.com/TechMaster/core/config"
 	"github.com/TechMaster/core/pmodel"
+	// "github.com/TechMaster/core/template"
+	// "github.com/kataras/iris/v12"
 
 	// "github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
@@ -19,14 +21,18 @@ Hãy chạy ở chế độ debug test
 // 	config.ReadConfig("..")
 // 	asynClient := InitRedisMail()
 // 	defer asynClient.Close()
+// 	app := iris.New()
+// 	template.InitBlockEngine(app, "../views", "default")
+
 // 	var err error
 
-// 	for i := 0; i < 3; i++ {
-// 		err = Emailer.SendPlainEmail([]string{"cuong@techmaster.vn"}, gofakeit.Sentence(10), gofakeit.Paragraph(3, 5, 7, "\n\n"))
+// 		err = Emailer.SendHTMLEmail([]string{"nhatduc@techmaster.vn"}, gofakeit.Sentence(10),map[string]interface{}{
+// 			"Name": "Nhat Duc",
+// 		},"mail_marketing",iris.NoLayout)
 // 		if err != nil {
-// 			break
+// 			return
 // 		}
-// 	}
+
 // 	assert := assert.New(t)
 // 	assert.Nil(err)
 // }

@@ -52,7 +52,7 @@ func Log(ctx iris.Context, err error) {
 		return		
 	default: //Lỗi thông thường
 		fmt.Println(err.Error()) //In ra console
-		if shouldReturnJSON {    //Trả về JSON
+		if shouldReturnJSON {  //Trả về JSON
 			ctx.StatusCode(iris.StatusInternalServerError)
 			_, _ = ctx.JSON(err.Error())
 		} else {

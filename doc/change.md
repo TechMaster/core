@@ -1,5 +1,8 @@
 # Những thay đổi
 
+## 0.1.50: 22/03/2022
+- Bổ sung tính năng nếu chương trình đang chạy ở chế độ debug thì log query ra console. File thay đổi [ở đây](../db/db.go)
+
 ## 0.1.46: 09/03/2022
 - Bổ sung gửi email marketing. File bổ sung [ở đây](../email/redis_mail.go)
 
