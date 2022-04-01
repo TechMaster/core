@@ -1,5 +1,9 @@
 # Những thay đổi
 
+## 0.1.51: 1/4/2022
+- Thay đổi cách log error ra console, thống nhất trả ra kiểu text đối với content-type application/json thay vì lúc json, lúc text. File thay đổi [ở đây](../logger/log_error.go)
+- Import module eris mới nhất
+
 ## 0.1.50: 22/03/2022
 - Bổ sung tính năng nếu chương trình đang chạy ở chế độ debug thì log query ra console. File thay đổi [ở đây](../db/db.go)
 

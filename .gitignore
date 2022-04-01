@@ -5,3 +5,4 @@ data/*.*
 *.rdb
 __debug_bin
 .vscode
+core.iml

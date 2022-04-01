@@ -24,20 +24,14 @@ func Log(ctx iris.Context, err error) {
 			logErisError(e)
 		}
 
-		if shouldReturnJSON { //Có trả về báo lỗi dạng JSON cho REST API request không?
-			errorBody := iris.Map{
-				"error": e.Error(),
-			}
-			if e.Data != nil { //không có dữ liệu đi kèm thì chỉ cần in thông báo lỗi
-				errorBody["data"] = e.Data
-			}
+		if shouldReturnJSON { //Có trả về báo lỗi dạng JSON cho REST API request không
 			if e.Code > 300 {
 				ctx.StatusCode(e.Code)
 			} else {
 				ctx.StatusCode(iris.StatusInternalServerError)
 			}
 
-			_, _ = ctx.JSON(errorBody) //Trả về cho client gọi REST API
+			_, _ = ctx.JSON(e.Error()) //Trả về cho client gọi REST API
 			return                     //Xuất ra JSON rồi thì không hiển thị Error Page nữa
 		}
 
