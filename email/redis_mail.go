@@ -96,6 +96,7 @@ func (rmail RedisMail) SendHTMLEmail(to []string, subject string, data map[strin
 	if err != nil {
 		return eris.NewFromMsg(err, "Could not enqueue task").InternalServerError()
 	}
+
 	fmt.Printf("enqueued task: id=%s queue=%s\n", info.ID, info.Queue)
 	return nil
 }

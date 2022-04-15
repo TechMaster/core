@@ -57,10 +57,3 @@ func Log(ctx iris.Context, err error) {
 		return
 	}
 }
-
-//Kiểm tra xem có lỗi thì báo lỗi
-func CheckErr(ctx iris.Context, err error) {
-	if err != nil {
-		Log(ctx, eris.WrapFrom(err, 4))
-	}
-}

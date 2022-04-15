@@ -10,7 +10,7 @@
     "redis": {
         "network": "tcp",
         "addr": "localhost:6379",
-        "password": "123",
+        "password": "",
         "database": "",
         "max_idle": 0,
         "max_active": 0,

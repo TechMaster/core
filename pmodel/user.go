@@ -4,16 +4,16 @@ package pmodel
 import "time"
 
 type User struct {
-	tableName           struct{}  `pg:"auth.users"` //Postgresql không chấp nhận bảng có tên là user
-	Id                  string    `pg:",pk" json:"id"`                //chuỗi ngẫu nhiên duy nhất
+	tableName           struct{}  `pg:"auth.users"`    //Postgresql không chấp nhận bảng có tên là user
+	Id                  string    `pg:",pk" json:"id"` //chuỗi ngẫu nhiên duy nhất
 	Email               string    `pg:",unique" json:"email"`
 	FullName            string    `valid:"required~Họ tên không được để trống,runelength(4|100)~Họ tên không hợp lệ (từ 4 - 100 ký tự)" json:"full_name"`
-	Password            string    `json:"password"`     // Hashed password. Tuyệt đối không lưu raw password
-	Phone               string    `json:"phone" valid:"numeric,runelength(10|11)~Số điện thoại không hợp lệ (từ 10 - 11 ký tự)" json:"full_name"`        // Số di động ở VN có từ 10-11 chữ số
-	Avatar              string    `json:"avatar"`       // Ảnh đại diện
-	Description         string    `json:"description"`  // Mô tả
-	BankName            string    `json:"bank_name"`    // Tên ngân hàng
-	BankAccount         string    `json:"bank_account"` // Số tài khoản ngân hàng
+	Password            string    `json:"password"`                                                                                               // Hashed password. Tuyệt đối không lưu raw password
+	Phone               string    `json:"phone" valid:"numeric,runelength(10|11)~Số điện thoại không hợp lệ (từ 10 - 11 ký tự)" json:"full_name"` // Số di động ở VN có từ 10-11 chữ số
+	Avatar              string    `json:"avatar"`                                                                                                 // Ảnh đại diện
+	Description         string    `json:"description"`                                                                                            // Mô tả
+	BankName            string    `json:"bank_name"`                                                                                              // Tên ngân hàng
+	BankAccount         string    `json:"bank_account"`                                                                                           // Số tài khoản ngân hàng
 	Slug                string    `json:"slug"`
 	Roles               []int     `pg:",array" json:"roles"`
 	AccessFailedCount   int32     `sql:"default:0" json:"access_failed_count"` // Số lần đăng nhập sai, mặc định là 0
@@ -27,6 +27,7 @@ type User struct {
 	ModifiedBy          string    `json:"modified_by"`                         // Người cập nhật thông tin tài khoản gần nhất
 	UserStatus          bool      `sql:"default:true" json:"user_status"`      // True là active, False là unactive, mặc định là True
 	Salt                string    `json:"salt"`                                // Dùng để kiểm tra hash password. Khi dùng BCrypt không cần nữa
+	NewEmail            string    `json:"new_email"`
 }
 
 /*
@@ -38,7 +39,7 @@ type AuthenInfo struct {
 	UserId       string //unique id của user
 	UserFullName string //họ và tên đầy đủ của user
 	UserEmail    string //email cũng phải unique
-	UserAvatar  string //unique id hoặc tên file ảnh đại diện
-	UserPhone	string
-	Roles        Roles  //kiểu map[int]bool. Cần phải chuyển đổi Roles []int32 `pg:",array"` sang
+	UserAvatar   string //unique id hoặc tên file ảnh đại diện
+	UserPhone    string
+	Roles        Roles //kiểu map[int]bool. Cần phải chuyển đổi Roles []int32 `pg:",array"` sang
 }
