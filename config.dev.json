@@ -2,10 +2,10 @@
     "host": "http://localhost:9001",
     "port": ":9001",
     "database": {
-        "user": "code123",
+        "user": "postgres",
         "password": "123",
         "database": "demo",
-        "address": "localhost:5433"
+        "address": "localhost:5432"
     },
     "redis": {
         "network": "tcp",
