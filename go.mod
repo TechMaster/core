@@ -3,7 +3,7 @@ module github.com/TechMaster/core
 go 1.17
 
 require (
-	github.com/TechMaster/eris v0.2.1-0.20220607044448-ee313a1b504f
+	github.com/TechMaster/eris v0.2.3
 	github.com/brianvoe/gofakeit/v6 v6.16.0
 	github.com/didip/tollbooth/v6 v6.1.2
 	github.com/go-pg/pg/v10 v10.10.6
@@ -19,10 +19,10 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/viper v1.12.0
-	github.com/stretchr/testify v1.7.2
+	github.com/stretchr/testify v1.7.5
 	github.com/valyala/bytebufferpool v1.0.0
 	github.com/wuriyanto48/go-pbkdf2 v0.0.1
-	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
+	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 )
 
 require (
@@ -73,7 +73,7 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/subosito/gotenv v1.4.0 // indirect
+	github.com/subosito/gotenv v1.3.0 // indirect
 	github.com/tdewolff/minify/v2 v2.11.7 // indirect
 	github.com/tdewolff/parse/v2 v2.5.32 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
