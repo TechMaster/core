@@ -12,7 +12,7 @@ import (
 
 var DB *pg.DB
 
-func ConnectPostgresqlDB(){
+func ConnectPostgresqlDB() {
 	DB = pg.Connect(&pg.Options{
 		User:     viper.GetString("database.user"),
 		Password: viper.GetString("database.password"),
@@ -22,7 +22,7 @@ func ConnectPostgresqlDB(){
 
 	pgjson.SetProvider(NewJSONProvider()) //Sử dụng goccy json
 
-	if config.IsAppInDebugMode(){
+	if config.IsAppInDebugMode() || viper.GetString("database.database") == "postgres" {
 		DB.AddQueryHook(dbLogger{}) //Log query to console
 	}
 }
