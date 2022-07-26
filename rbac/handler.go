@@ -1,13 +1,11 @@
 package rbac
 
 import (
-	"net/http"
-	"regexp"
-
 	"github.com/TechMaster/core/pmodel"
-
 	"github.com/kataras/iris/v12/context"
 	"github.com/kataras/iris/v12/core/router"
+	"net/http"
+	"regexp"
 )
 
 /*
@@ -47,6 +45,11 @@ func Put(party router.Party, relativePath string, roleExp RoleExp, handlers ...c
 func Delete(party router.Party, relativePath string, roleExp RoleExp, handlers ...context.Handler) {
 	party.Handle(http.MethodDelete, relativePath, handlers...)
 	assignRoles(http.MethodDelete, party.GetRelPath()+relativePath, roleExp())
+}
+
+func Patch(party router.Party, relativePath string, roleExp RoleExp, handlers ...context.Handler) {
+	party.Handle(http.MethodPatch, relativePath, handlers...)
+	assignRoles(http.MethodPatch, party.GetRelPath()+relativePath, roleExp())
 }
 
 func Any(party router.Party, relativePath string, roleExp RoleExp, handlers ...context.Handler) {
