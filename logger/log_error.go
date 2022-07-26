@@ -13,7 +13,7 @@ import (
 
 // Chuyên xử lý các err mà controller trả về
 func Log(ctx iris.Context, err error) {
-	if errors.Is(err, syscall.EPIPE){
+	if errors.Is(err, syscall.EPIPE) {
 		return
 	}
 	//Trả về JSON error khi client gọi lên bằng AJAX hoặc request.ContentType dạng application/json
@@ -31,8 +31,8 @@ func Log(ctx iris.Context, err error) {
 				ctx.StatusCode(iris.StatusInternalServerError)
 			}
 
-			_, _ = ctx.JSON(e.Error()) //Trả về cho client gọi REST API
-			return                     //Xuất ra JSON rồi thì không hiển thị Error Page nữa
+			_ = ctx.JSON(e.Error()) //Trả về cho client gọi REST API
+			return                  //Xuất ra JSON rồi thì không hiển thị Error Page nữa
 		}
 
 		// Nếu request không phải là REST request (AJAX request) thì render error page
@@ -43,12 +43,12 @@ func Log(ctx iris.Context, err error) {
 			}
 		}
 		_ = ctx.View(LogConf.ErrorTemplate)
-		return		
+		return
 	default: //Lỗi thông thường
 		fmt.Println(err.Error()) //In ra console
-		if shouldReturnJSON {  //Trả về JSON
+		if shouldReturnJSON {    //Trả về JSON
 			ctx.StatusCode(iris.StatusInternalServerError)
-			_, _ = ctx.JSON(err.Error())
+			_ = ctx.JSON(err.Error())
 		} else {
 			_ = ctx.View(LogConf.ErrorTemplate, iris.Map{
 				"ErrorMsg": err.Error(),

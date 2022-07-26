@@ -61,7 +61,7 @@ func Books(ctx iris.Context) {
 		Books    []Book             `json:"books"`
 	}
 
-	_, _ = ctx.JSON(Data{
+	_ = ctx.JSON(Data{
 		AuthInfo: authinfo,
 		Books: []Book{
 			{

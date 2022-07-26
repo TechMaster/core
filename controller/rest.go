@@ -36,15 +36,15 @@ func LoginREST(ctx iris.Context) {
 	}
 
 	//Login thành công thì quay về trang chủ
-	_, _ = ctx.JSON(pmodel.AuthenInfo{
+	_ = ctx.JSON(pmodel.AuthenInfo{
 		UserId:       user.Id,
 		UserFullName: user.FullName,
 		UserEmail:    user.Email,
-		Roles:    pmodel.IntArrToRoles(user.Roles), //Chuyển từ mảng []int sang map[int]bool
+		Roles:        pmodel.IntArrToRoles(user.Roles), //Chuyển từ mảng []int sang map[int]bool
 	})
 }
 
 func LogoutREST(ctx iris.Context) {
 	_ = session.Logout(ctx)
-	_, _ = ctx.JSON("Logout success")
+	_ = ctx.JSON("Logout success")
 }
