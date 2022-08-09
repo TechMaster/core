@@ -34,6 +34,7 @@ func Log(ctx iris.Context, err error) {
 			_ = ctx.JSON(e.Error()) //Trả về cho client gọi REST API
 			return                  //Xuất ra JSON rồi thì không hiển thị Error Page nữa
 		}
+		iris.NoCache(ctx)
 
 		// Nếu request không phải là REST request (AJAX request) thì render error page
 		ctx.ViewData("ErrorMsg", e.Error())
@@ -50,6 +51,7 @@ func Log(ctx iris.Context, err error) {
 			ctx.StatusCode(iris.StatusInternalServerError)
 			_ = ctx.JSON(err.Error())
 		} else {
+			iris.NoCache(ctx)
 			_ = ctx.View(LogConf.ErrorTemplate, iris.Map{
 				"ErrorMsg": err.Error(),
 			})
