@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/kataras/iris/v12/cache"
+	"github.com/kataras/iris/v12/cache/client"
 	"github.com/kataras/iris/v12/context"
 	"syscall"
 
@@ -66,4 +67,5 @@ func setNoCache(ctx iris.Context) {
 	ctx.Header(context.CacheControlHeaderKey, cache.CacheControlHeaderValue)
 	ctx.Header(cache.PragmaHeaderKey, cache.PragmaNoCacheHeaderValue)
 	ctx.Header(cache.ExpiresHeaderKey, cache.ExpiresNeverHeaderValue)
+	client.NoCache(ctx)
 }
