@@ -4,30 +4,31 @@ package pmodel
 import "time"
 
 type User struct {
-	tableName           struct{}  `pg:"auth.users"`    //Postgresql không chấp nhận bảng có tên là user
-	Id                  string    `pg:",pk" json:"id"` //chuỗi ngẫu nhiên duy nhất
+	tableName           struct{}  `pg:"auth.users"`
+	Id                  string    `pg:",pk" json:"id"`
 	Email               string    `pg:",unique" json:"email"`
 	FullName            string    `valid:"required~Họ tên không được để trống,runelength(4|100)~Họ tên không hợp lệ (từ 4 - 100 ký tự)" json:"full_name"`
-	Password            string    `json:"password"`                                                                                               // Hashed password. Tuyệt đối không lưu raw password
-	Phone               string    `json:"phone" valid:"numeric,runelength(10|11)~Số điện thoại không hợp lệ (từ 10 - 11 ký tự)" json:"full_name"` // Số di động ở VN có từ 10-11 chữ số
-	Avatar              string    `json:"avatar"`                                                                                                 // Ảnh đại diện
-	Description         string    `json:"description"`                                                                                            // Mô tả
-	BankName            string    `json:"bank_name"`                                                                                              // Tên ngân hàng
-	BankAccount         string    `json:"bank_account"`                                                                                           // Số tài khoản ngân hàng
+	Password            string    `json:"password"`
+	Phone               string    `json:"phone" valid:"numeric,runelength(10|11)~Số điện thoại không hợp lệ (từ 10 - 11 ký tự)" json:"full_name"`
+	Avatar              string    `json:"avatar"`
+	Description         string    `json:"description"`
+	BankName            string    `json:"bank_name"`
+	BankAccount         string    `json:"bank_account"`
 	Slug                string    `json:"slug"`
 	Roles               []int     `pg:",array" json:"roles"`
-	AccessFailedCount   int32     `sql:"default:0" json:"access_failed_count"` // Số lần đăng nhập sai, mặc định là 0
-	EmailConfirmed      bool      `json:"email_confirmed" sql:"default:false"` // Email đã xác nhận (kích hoạt) hay chưa
-	VerifyEmailToken    string    `json:"verify_email_token"`                  // Token để xác thực Email
-	VerifyEmailTokenEnd time.Time `json:"verify_email_token_end"`              // Thời gian hiệu lực của Token xác thực email
-	LockoutEnd          time.Time `json:"lockout_end"`                         // Thời điểm hết khoá tài khoản
-	CreatedAt           time.Time `sql:"default:now()" json:"created_at"`      // Ngày tài khoản được tạo
-	CreatedBy           string    `json:"created_by"`                          // Id người tạo tài khoản, Null là người dùng tự đăng ký tài khoản
-	ModifiedAt          time.Time `sql:"default:now()" json:"modified_at"`     // Ngày gần nhất tài khoản cập nhật thông tin
-	ModifiedBy          string    `json:"modified_by"`                         // Người cập nhật thông tin tài khoản gần nhất
-	UserStatus          bool      `sql:"default:true" json:"user_status"`      // True là active, False là unactive, mặc định là True
-	Salt                string    `json:"salt"`                                // Dùng để kiểm tra hash password. Khi dùng BCrypt không cần nữa
+	AccessFailedCount   int32     `sql:"default:0" json:"access_failed_count"`
+	EmailConfirmed      bool      `json:"email_confirmed" sql:"default:false"`
+	VerifyEmailToken    string    `json:"verify_email_token"`
+	VerifyEmailTokenEnd time.Time `json:"verify_email_token_end"`
+	LockoutEnd          time.Time `json:"lockout_end"`
+	CreatedAt           time.Time `sql:"default:now()" json:"created_at"`
+	CreatedBy           string    `json:"created_by"`
+	ModifiedAt          time.Time `sql:"default:now()" json:"modified_at"`
+	ModifiedBy          string    `json:"modified_by"`
+	UserStatus          bool      `sql:"default:true" json:"user_status"`
+	Salt                string    `json:"salt"`
 	NewEmail            string    `json:"new_email"`
+	Dob                 time.Time `json:"dob"`
 }
 
 /*
