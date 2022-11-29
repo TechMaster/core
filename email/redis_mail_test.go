@@ -20,13 +20,19 @@ func Test_Send_Email_Send(t *testing.T) {
 	defer asynClient.Close()
 	app := iris.New()
 	template.InitBlockEngine(app, "../views", "default")
-
 	var err error
 
-		err = Emailer.SendHTMLEmail([]string{"nhatduc@techmaster.vn"}, gofakeit.Sentence(10),map[string]interface{}{
-			"Name": "Nhat Duc",
-		},"mail_marketing",iris.NoLayout)
-
+	err = Emailer.SendHTMLEmail([]string{"nhatduc@techmaster.vn", "nhatduc.hoanghapaper@gmail.com"},
+		gofakeit.Sentence(10), map[string]interface{}{
+			"billings": []map[string]interface{}{{
+				"ItemTitle": "hàng ngon",
+			},
+			},
+			"user": map[string]interface{}{
+				"FullName": "Nhật Đức",
+			},
+			"guide": "gì đấy",
+		}, SEND_MAIL_SUBMIT_ORDER)
 
 	assert := assert.New(t)
 	assert.Nil(err)

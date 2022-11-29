@@ -17,7 +17,7 @@ func InitGmail(config *SMTPConfig) {
 	}
 }
 
-//--- Hai phương thức implement interface MailSender
+// --- Hai phương thức implement interface MailSender
 func (gmail GmailSTMP) SendPlainEmail(to []string, subject string, body string) error {
 
 	emailAuth := smtp.PlainAuth("me", gmail.config.From, gmail.config.Password, gmail.config.Host)
@@ -33,10 +33,10 @@ func (gmail GmailSTMP) SendPlainEmail(to []string, subject string, body string) 
 	return nil
 }
 
-func (gmail GmailSTMP) SendHTMLEmail(to []string, subject string, data map[string]interface{}, tmpl_layout ...string) error {
+func (gmail GmailSTMP) SendHTMLEmail(to []string, subject string, data map[string]interface{}, templateId string) error {
 	emailAuth := smtp.PlainAuth("me", gmail.config.From, gmail.config.Password, gmail.config.Host)
 
-	body, err := renderHTML(data, tmpl_layout...)
+	body, err := renderHTML(data)
 	if err != nil {
 		return err
 	}

@@ -23,7 +23,7 @@ func InitFakeGmail(config *SMTPConfig, test_receive_email string) {
 	receive_email = []string{test_receive_email}
 }
 
-//--- Hai phương thức implement interface MailSender
+// --- Hai phương thức implement interface MailSender
 func (gmail FakeGmail) SendPlainEmail(to []string, subject string, body string) error {
 
 	emailAuth := smtp.PlainAuth("me", gmail.config.From, gmail.config.Password, gmail.config.Host)
@@ -39,10 +39,10 @@ func (gmail FakeGmail) SendPlainEmail(to []string, subject string, body string) 
 	return nil
 }
 
-func (gmail FakeGmail) SendHTMLEmail(to []string, subject string, data map[string]interface{}, tmpl_layout ...string) error {
+func (gmail FakeGmail) SendHTMLEmail(to []string, subject string, data map[string]interface{}, templateId string) error {
 	emailAuth := smtp.PlainAuth("me", gmail.config.From, gmail.config.Password, gmail.config.Host)
 
-	body, err := renderHTML(data, tmpl_layout...)
+	body, err := renderHTML(data)
 	if err != nil {
 		return err
 	}

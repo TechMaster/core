@@ -39,8 +39,8 @@ func (emailDB EmailDB) SendPlainEmail(to []string, subject string, body string) 
 	return nil
 }
 
-func (emailDB EmailDB) SendHTMLEmail(to []string, subject string, data map[string]interface{}, tmpl_layout ...string) error {
-	body, err := renderHTML(data, tmpl_layout...)
+func (emailDB EmailDB) SendHTMLEmail(to []string, subject string, data map[string]interface{}, templateId string) error {
+	body, err := renderHTML(data)
 	if err != nil {
 		return err
 	}

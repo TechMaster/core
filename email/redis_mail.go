@@ -20,9 +20,10 @@ const (
 )
 
 type EmailPayload struct {
-	To      []string
-	Subject string
-	Msg     []byte
+	To       []string
+	Subject  string
+	Data     map[string]interface{}
+	Template string
 }
 
 type MailMarketing struct {
@@ -63,7 +64,6 @@ func (rmail RedisMail) SendPlainEmail(to []string, subject string, body string) 
 	payload, err := json.Marshal(EmailPayload{
 		To:      to,
 		Subject: subject,
-		Msg:     []byte(body),
 	})
 	if err != nil {
 		return eris.NewFrom(err).InternalServerError()
@@ -77,16 +77,13 @@ func (rmail RedisMail) SendPlainEmail(to []string, subject string, body string) 
 	return nil
 }
 
-func (rmail RedisMail) SendHTMLEmail(to []string, subject string, data map[string]interface{}, tmpl_layout ...string) error {
-	body, err := renderHTML(data, tmpl_layout...)
-	if err != nil {
-		return err
-	}
+func (rmail RedisMail) SendHTMLEmail(to []string, subject string, data map[string]interface{}, templateId string) error {
 
 	payload, err := json.Marshal(EmailPayload{
-		To:      to,
-		Subject: subject,
-		Msg:     []byte(body),
+		To:       to,
+		Subject:  subject,
+		Data:     data,
+		Template: templateId,
 	})
 	if err != nil {
 		return eris.NewFrom(err).InternalServerError()
