@@ -19,7 +19,7 @@ import (
 	Việc này sẽ buộc người dùng phải đăng nhập lại ở tất cả các thiết bị.
 */
 
-//Hàm này chỉ được chạy bởi Admin
+// Hàm này chỉ được chạy bởi Admin
 func UpdateUserInfo(userID string, authinfo *pmodel.AuthenInfo) error {
 	bgCtx := context.Background()
 	arrSessID, err := RedisClient.SMembers(bgCtx, userID).Result()
@@ -34,7 +34,7 @@ func UpdateUserInfo(userID string, authinfo *pmodel.AuthenInfo) error {
 	}
 
 	//Cập nhật lại AuthInfo
-	for _, sessid := range arrSessID {	
+	for _, sessid := range arrSessID {
 		RedisClient.HSet(bgCtx, sessid, SESS_USER, string(data))
 	}
 	return nil

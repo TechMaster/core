@@ -9,8 +9,9 @@ type User struct {
 	Email               string    `pg:",unique" json:"email"`
 	FullName            string    `valid:"required~Họ tên không được để trống,runelength(4|100)~Họ tên không hợp lệ (từ 4 - 100 ký tự)" json:"full_name"`
 	Password            string    `json:"password"`
-	Phone               string    `json:"phone" valid:"numeric,runelength(10|11)~Số điện thoại không hợp lệ (từ 10 - 11 ký tự)" json:"full_name"`
+	Phone               string    `json:"phone" valid:"numeric,runelength(10|11)~Số điện thoại không hợp lệ (từ 10 - 11 ký tự)"`
 	Avatar              string    `json:"avatar"`
+	LinkCv              string    `json:"link_cv"`
 	Description         string    `json:"description"`
 	BankName            string    `json:"bank_name"`
 	BankAccount         string    `json:"bank_account"`
@@ -23,7 +24,7 @@ type User struct {
 	LockoutEnd          time.Time `json:"lockout_end"`
 	CreatedAt           time.Time `sql:"default:now()" json:"created_at"`
 	CreatedBy           string    `json:"created_by"`
-	ModifiedAt          time.Time `sql:"default:now()" json:"modified_at"`
+	ModifiedAt          time.Time `json:"modified_at"`
 	ModifiedBy          string    `json:"modified_by"`
 	UserStatus          bool      `sql:"default:true" json:"user_status"`
 	Salt                string    `json:"salt"`

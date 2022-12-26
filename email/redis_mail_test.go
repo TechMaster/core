@@ -31,8 +31,8 @@ func Test_Send_Email_Send(t *testing.T) {
 			"user": map[string]interface{}{
 				"FullName": "Nhật Đức",
 			},
-			"guide": "gì đấy",
-		}, SEND_MAIL_SUBMIT_ORDER)
+			"guide": "gì đấy @@",
+		}, "12B65YN7ZVM98DGEW0863VXZ7HR3")
 
 	assert := assert.New(t)
 	assert.Nil(err)

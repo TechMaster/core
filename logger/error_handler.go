@@ -9,7 +9,7 @@ import (
 	"github.com/goccy/go-json"
 )
 
-//Hàm chuyên xử lý Eris Error có Stack Trace. Chỉ áp dụng với cấp độ lỗi ERROR, SYSERROR, PANIC
+// Hàm chuyên xử lý Eris Error có Stack Trace. Chỉ áp dụng với cấp độ lỗi ERROR, SYSERROR, PANIC
 func logErisError(err *eris.Error) {
 	formattedStr := eris.ToCustomString(err, ErisStringFormat) //Định dạng lỗi Eris
 
@@ -33,7 +33,7 @@ func logErisError(err *eris.Error) {
 			} else {
 				textToFile = time.Now().Format("2006 01 02-15:04:05 - ") + formattedStr + "\n\n"
 			}
-			if _, err := logFile.WriteString(textToFile); err != nil {
+			if _, err = logFile.WriteString(textToFile); err != nil {
 				panic(err)
 			}
 		}
