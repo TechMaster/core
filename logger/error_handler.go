@@ -33,7 +33,7 @@ func logErisError(err *eris.Error) {
 			} else {
 				textToFile = time.Now().Format("2006 01 02-15:04:05 - ") + formattedStr + "\n\n"
 			}
-			if _, err = logFile.WriteString(textToFile); err != nil {
+			if _, err := logFile.WriteString(textToFile); err != nil {
 				panic(err)
 			}
 		}

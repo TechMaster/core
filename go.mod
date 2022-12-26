@@ -1,6 +1,6 @@
 module github.com/TechMaster/core
 
-go 1.17
+go 1.19
 
 require (
 	github.com/TechMaster/eris v0.2.3
@@ -8,6 +8,7 @@ require (
 	github.com/didip/tollbooth/v6 v6.1.2
 	github.com/go-pg/pg/v10 v10.10.6
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/go-redis/redis/v9 v9.0.0-rc.2
 	github.com/goccy/go-json v0.9.10
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-retryablehttp v0.7.1
@@ -19,7 +20,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/viper v1.12.0
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.1
 	github.com/valyala/bytebufferpool v1.0.0
 	github.com/wuriyanto48/go-pbkdf2 v0.0.1
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
@@ -81,9 +82,9 @@ require (
 	github.com/vmihailenco/tagparser v0.1.2 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/yosssi/ace v0.0.5 // indirect
-	golang.org/x/net v0.0.0-20220622184535-263ec571b305 // indirect
-	golang.org/x/sys v0.0.0-20220622161953-175b2fd9d664 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/net v0.2.0 // indirect
+	golang.org/x/sys v0.2.0 // indirect
+	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/time v0.0.0-20220609170525-579cf78fd858 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/ini.v1 v1.66.6 // indirect

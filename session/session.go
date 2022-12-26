@@ -5,7 +5,7 @@ import (
 
 	"github.com/TechMaster/core/sessions"
 	redis_session "github.com/TechMaster/core/sessions/sessiondb/redis"
-	"github.com/go-redis/redis/v8"
+	"github.com/go-redis/redis/v9"
 	"github.com/spf13/viper"
 )
 
@@ -15,13 +15,15 @@ const (
 	AUTHINFO       = "authinfo"
 )
 
-//Các biến dùng chung trong packge
+// Các biến dùng chung trong packge
 var Sess *sessions.Sessions         //Cấu hình Session Manager
 var redisDB *redis_session.Database //Đây là một wrapper nối xuống Redis của Iris
 var RedisClient *redis.Client       //Đây là redis client trực tiếp nối xuống Redis db không qua Iris
-var expires = time.Hour * 720         //Thời gian mà 1 session sẽ hết hạn và bị xoá khỏi Redis
+var expires = time.Hour * 720       //Thời gian mà 1 session sẽ hết hạn và bị xoá khỏi Redis
 
-/* Khởi tạo In Memory Session, không kết nối vào Redis hay bất kỳ CSDL nào
+/*
+	Khởi tạo In Memory Session, không kết nối vào Redis hay bất kỳ CSDL nào
+
 Dùng trong ứng dụng đơn lẻ
 */
 func init() {
