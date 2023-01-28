@@ -12,6 +12,7 @@ type User struct {
 	Phone               string    `json:"phone" valid:"numeric,runelength(10|11)~Số điện thoại không hợp lệ (từ 10 - 11 ký tự)"`
 	Avatar              string    `json:"avatar"`
 	LinkCv              string    `json:"link_cv"`
+	QrCode              string    `json:"qr_code"`
 	Description         string    `json:"description"`
 	BankName            string    `json:"bank_name"`
 	BankAccount         string    `json:"bank_account"`
