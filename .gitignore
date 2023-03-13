@@ -6,3 +6,4 @@ data/*.*
 __debug_bin
 .vscode
 core.iml
+.idea
