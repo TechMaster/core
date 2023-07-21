@@ -5,11 +5,14 @@ go 1.19
 require (
 	github.com/TechMaster/eris v0.2.3
 	github.com/brianvoe/gofakeit/v6 v6.17.0
+	github.com/casbin/casbin/v2 v2.72.1
+	github.com/casbin/redis-adapter/v3 v3.2.1
 	github.com/didip/tollbooth/v6 v6.1.2
 	github.com/go-pg/pg/v10 v10.10.6
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-redis/redis/v9 v9.0.0-rc.2
 	github.com/goccy/go-json v0.9.10
+	github.com/gomodule/redigo v1.8.9
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-retryablehttp v0.7.1
 	github.com/hibiken/asynq v0.23.0
@@ -30,6 +33,7 @@ require (
 	github.com/BurntSushi/toml v1.2.0 // indirect
 	github.com/CloudyKit/fastprinter v0.0.0-20200109182630-33d98a066a53 // indirect
 	github.com/CloudyKit/jet/v6 v6.1.0 // indirect
+	github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible // indirect
 	github.com/Shopify/goreferrer v0.0.0-20210630161223-536fa16abd6f // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
@@ -76,6 +80,9 @@ require (
 	github.com/subosito/gotenv v1.4.0 // indirect
 	github.com/tdewolff/minify/v2 v2.12.0 // indirect
 	github.com/tdewolff/parse/v2 v2.6.1 // indirect
+	github.com/tidwall/gjson v1.14.4 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
 	github.com/vmihailenco/bufpool v0.1.11 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
