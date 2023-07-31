@@ -6,6 +6,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/kataras/iris/v12"
 	"github.com/spf13/viper"
+	"regexp"
 )
 
 /*
@@ -14,7 +15,7 @@ import (
 và database redis sẽ lưu các policy (mặc định là 3), trả về enforcer để sau này thêm, xóa, cập
 nhật policy
 */
-func ConnectCasbinDB(fileconfig string, database int) *casbin.Enforcer {
+func ConnectCasbinDB(fileconfig string, database int) (*casbin.Enforcer, error) {
 	pool := &redis.Pool{
 		Dial: func() (redis.Conn, error) {
 			c, err := redis.Dial(viper.GetString("redis.network"), viper.GetString("redis.addr"), redis.DialDatabase(database))
@@ -25,13 +26,16 @@ func ConnectCasbinDB(fileconfig string, database int) *casbin.Enforcer {
 		},
 	}
 
-	a, _ := redisadapter.NewAdapterWithPool(pool)
+	a, err := redisadapter.NewAdapterWithPool(pool)
+	if err != nil {
+		return nil, err
+	}
+	e, err := casbin.NewEnforcer(fileconfig, a)
+	if err != nil {
+		return nil, err
+	}
 
-	e, _ := casbin.NewEnforcer(fileconfig, a)
-
-	e.LoadPolicy()
-
-	return e
+	return e, e.LoadPolicy()
 }
 
 /*
@@ -39,10 +43,12 @@ func ConnectCasbinDB(fileconfig string, database int) *casbin.Enforcer {
 
 Lưu ý kết nối casbin database trước
 */
-func AddOldRole(app *iris.Application, enforce *casbin.Enforcer) {
+func AddOldRole(app *iris.Application, enforce *casbin.Enforcer) (err error) {
 	routes := app.GetRoutes()
+	regxp := regexp.MustCompile(`:(([a-zA-Z_])*)`)
+
 	for _, route := range routes {
-		for i := range pathsRoles[route.Path][route.Method] {
+		for i := range pathsRoles[regxp.ReplaceAllString(route.Path, "{$1}")][route.Method] {
 			var role string
 			switch i {
 			case ADMIN:
@@ -62,9 +68,12 @@ func AddOldRole(app *iris.Application, enforce *casbin.Enforcer) {
 			case MAINTAINER:
 				role = "MAINTAINER"
 			}
-			enforce.AddPolicy(role, viper.GetString("host")+route.Path, route.Method)
+			_, err = enforce.AddPolicy(role, viper.GetString("host")+route.Path, route.Method)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	enforce.SavePolicy()
+	return enforce.SavePolicy()
 }
