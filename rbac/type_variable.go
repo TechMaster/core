@@ -16,10 +16,10 @@ const (
 	MAINTAINER = 8 //quản trị hệ thống, gánh bớt việc cho Admin, back up dữ liệu. Sửa đổi profile,role user, ngoại trừ role ROOT và Admin
 )
 
-//Mảng này phải tương ứng với danh sách const khai báo ở trên
+// Mảng này phải tương ứng với danh sách const khai báo ở trên
 var allRoles = []int{ADMIN, STUDENT, TRAINER, SALE, EMPLOYER, AUTHOR, EDITOR, MAINTAINER}
 
-//Dùng để in role kiểu int ra string cho dễ hiếu
+// Dùng để in role kiểu int ra string cho dễ hiếu
 var roleName = map[int]string{
 	ADMIN:      "admin",
 	STUDENT:    "student",
@@ -33,10 +33,10 @@ var roleName = map[int]string{
 
 /*
 Biểu thức hàm sẽ trả về
-- bool: true nếu là allow, false: nếu là forbid
-- danh sách role kiểu map[int]bool.
-  Nếu allow thì giá trị map[int]bool đều là true
-	Nếu forbid thì giá trị map[int]bool đều là false
+  - bool: true nếu là allow, false: nếu là forbid
+  - danh sách role kiểu map[int]bool.
+    Nếu allow thì giá trị map[int]bool đều là true
+    Nếu forbid thì giá trị map[int]bool đều là false
 */
 type RoleExp func() pmodel.Roles
 
@@ -87,5 +87,5 @@ type Config struct {
 	MakeUnassignedRoutePublic bool
 }
 
-//Lưu cấu hình cho package RBAC
+// Lưu cấu hình cho package RBAC
 var config Config

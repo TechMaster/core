@@ -46,7 +46,7 @@ func Logout(ctx iris.Context) error {
 	sess := sessions.Get(ctx)
 	bgCtx := context.Background()
 	sessionID := sess.ID()
-	RedisClient.Del(bgCtx, sessionID) //Xoá sessionID thực sự
+	Sess.Destroy(ctx)
 
 	if authenInfo != nil {
 		//Loại bớt một phần tử trong tập một user.Id chứa nhiều session id của một user
@@ -55,5 +55,6 @@ func Logout(ctx iris.Context) error {
 			return err
 		}
 	}
+
 	return nil
 }

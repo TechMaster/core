@@ -10,13 +10,13 @@ import (
 	"github.com/kataras/iris/v12"
 )
 
-//Hàm này cần được gọi trước tất cả handler do lập trình viên viết
+// Hàm này cần được gọi trước tất cả handler do lập trình viên viết
 func CheckRoutePermission(ctx iris.Context) {
 	route := ctx.GetCurrentRoute().String() //Lấy route trong ctx
 	authinfo := session.GetAuthInfoSession(ctx)
 
 	//Nếu route không thuộc nhóm public routes cần kiểm tra phân quyền
-	if authinfo != nil && template.BlockEngine != nil { 
+	if authinfo != nil && template.BlockEngine != nil {
 		//Gán authinfo để cho handler phía sau dùng
 		ctx.ViewData(session.AUTHINFO, authinfo)
 	}
@@ -52,6 +52,7 @@ func CheckRoutePermission(ctx iris.Context) {
 rolesInRoute = routesRoles[route] //Lấy map roles gán cho route. Sẽ chỉ có 2 loại: AllowRoles và ForbidRoles rõ ràng
 
 Nếu route không thuộc nhóm public routes cần kiểm tra phân quyền
+
 	Duyệt qua tất cả quyền user có
 	C1: userrole có trong rolesInRoute
 			C1A: đó là allowed role
@@ -62,7 +63,6 @@ Nếu route không thuộc nhóm public routes cần kiểm tra phân quyền
 				ForbidOverAllow == true  -> allowGoNext = false -> exit loop
 				ForbidOverAllow == false -> allowGoNext = false, chưa exit loop vội, có thể
 	C2: userrole không có trong rolesInRoute, mặc nhiên allowGoNext = false
-
 */
 func checkUser_RouteRole_Intersect(userRoles pmodel.Roles, rolesInRoute pmodel.Roles) (allowGoNext bool) {
 
