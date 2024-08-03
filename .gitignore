@@ -4,6 +4,5 @@ data/*.*
 *.aof
 *.rdb
 __debug_bin
-.vscode
 core.iml
 .idea

@@ -52,6 +52,7 @@ func main() {
 	rbac.BuildPublicRoute(app)
 
 	//Khởi động email redis
+
 	asynClient := email.InitRedisMail()
 	email.SetDefaultEmailLayout("email_layout") //Set layout mặc định cho các HTML email
 	defer asynClient.Close()
