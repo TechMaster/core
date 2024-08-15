@@ -100,13 +100,11 @@ func RolesNames(roles pmodel.Roles) (rolesNames []string) {
 func ConvertRules(rules []pmodel.Rule) {
 
 	for _, rule := range rules {
-		special, _ := Allow(rule.SpecialRoles...)()
 		route := Route{
-			IsPrivate:    rule.IsPrivate,
-			Path:         rule.Path,
-			Method:       strings.ToUpper(rule.Method),
-			AccessType:   rule.AccessType,
-			SpecialRoles: special,
+			IsPrivate:  rule.IsPrivate,
+			Path:       rule.Path,
+			Method:     strings.ToUpper(rule.Method),
+			AccessType: rule.AccessType,
 		}
 		switch strings.ToLower(rule.AccessType) {
 		case ALLOW:
@@ -126,6 +124,8 @@ func ConvertRules(rules []pmodel.Rule) {
 			roles, _ := AllowOnlyAdmin()()
 			route.Roles = roles
 		}
+		special, _ := Allow(rule.SpecialRoles...)()
 		routesRoles[route.Method+" "+route.Path] = route
+		SpecialRoles[route.Method+" "+route.Path] = special
 	}
 }

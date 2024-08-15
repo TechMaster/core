@@ -27,6 +27,10 @@ Biểu thức hàm sẽ trả về
 */
 type RoleExp func() (pmodel.Roles, string)
 
+// SpecialRoles là danh sách các role đặc biệt
+
+var SpecialRoles = make(map[string]pmodel.Roles)
+
 /*
 Ứng với một route = HTTP Verb + Path chúng ta có một map các role
 Dùng để kiểm tra phân quyền
