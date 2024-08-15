@@ -41,6 +41,8 @@ func main() {
 	// Load các roles vào bộ nhớ
 	rbac.LoadRoles(func() []pmodel.Role {
 		return controller.Roles
+	}, map[string]bool{
+		"student": true,
 	})
 
 	rbacConfig := rbac.NewConfig()

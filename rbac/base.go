@@ -34,19 +34,41 @@ Load các roles vào bộ nhớ
 	@param fLoad: hàm trả về danh sách roles
 	- Khi load các roles Phải có role admin
 */
-func LoadRoles(fLoad func() []pmodel.Role) {
+
+func LoadRoles(fLoad func() []pmodel.Role, rolesRequire ...map[string]bool) {
 	roles := fLoad()
-	isAdmin := false
+	// Tạo một bản sao của rolesRequire để theo dõi các roles chưa được tìm thấy
+	missingRoles := map[string]bool{
+		"admin": true,
+	}
+	if len(rolesRequire) > 0 {
+		for k, v := range rolesRequire[0] {
+			missingRoles[k] = v
+		}
+	}
+	// Duyệt qua các roles được tải
 	for _, role := range roles {
 		name := strings.ToLower(role.Name)
-		if name == "admin" {
-			isAdmin = true
+		if ok := missingRoles[name]; ok {
+			delete(missingRoles, name) // Xóa role khỏi missingRoles nếu tìm thấy
 		}
 		Roles[name] = role.ID
 		roleName[role.ID] = name
 	}
-	if !isAdmin {
-		panic("Phải có role admin")
+
+	// Kiểm tra nếu có role yêu cầu nào không được tìm thấy
+	if len(missingRoles) > 0 {
+		var builder strings.Builder
+		builder.WriteString("Phải có role: ")
+		for name := range missingRoles {
+			builder.WriteString(name + ", ")
+		}
+		// Xóa dấu phẩy cuối cùng và khoảng trắng
+		str := builder.String()
+		if len(str) > 0 {
+			str = str[:len(str)-2]
+		}
+		panic(str)
 	}
 }
 

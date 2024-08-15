@@ -72,9 +72,10 @@ var config Config
 
 // Cấu trúc dùng để lưu thông tin của một route
 type Route struct {
-	Path       string
-	Method     string
-	IsPrivate  bool
-	Roles      pmodel.Roles
-	AccessType string
+	Path         string
+	Method       string
+	IsPrivate    bool
+	Roles        pmodel.Roles
+	SpecialRoles pmodel.Roles
+	AccessType   string
 }

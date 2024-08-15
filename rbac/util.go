@@ -98,12 +98,15 @@ func RolesNames(roles pmodel.Roles) (rolesNames []string) {
 
 // Hàm chuyển đổi từ Rule sang Route
 func ConvertRules(rules []pmodel.Rule) {
+
 	for _, rule := range rules {
+		special, _ := Allow(rule.SpecialRoles...)()
 		route := Route{
-			IsPrivate:  rule.IsPrivate,
-			Path:       rule.Path,
-			Method:     strings.ToUpper(rule.Method),
-			AccessType: rule.AccessType,
+			IsPrivate:    rule.IsPrivate,
+			Path:         rule.Path,
+			Method:       strings.ToUpper(rule.Method),
+			AccessType:   rule.AccessType,
+			SpecialRoles: special,
 		}
 		switch strings.ToLower(rule.AccessType) {
 		case ALLOW:
