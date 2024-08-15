@@ -1,6 +1,8 @@
 package pmodel
 
-/* Danh sách các role gán cho một người hoặc một route
+/*
+	Danh sách các role gán cho một người hoặc một route
+
 dữ liệu trong value kiểu bool nhưng tôi không dùng bool mà dùng interface{}
 bởi nếu dùng map[int]bool khi truyền vào key không tồn tại luôn trả về false
 nhưng tôi mong muốn phải trả về nil mới đúng bản chất
@@ -27,4 +29,12 @@ func IntArrToRoles(intArr []int) Roles {
 		roles[role] = true
 	}
 	return roles
+}
+
+/*
+Role là cấu hình cho việc kiểm tra quyền truy cập
+*/
+type Role struct {
+	ID   int
+	Name string // Tên của role | lowercase
 }

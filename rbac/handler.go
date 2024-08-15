@@ -1,11 +1,11 @@
 package rbac
 
 import (
-	"github.com/TechMaster/core/pmodel"
-	"github.com/kataras/iris/v12/context"
-	"github.com/kataras/iris/v12/core/router"
 	"net/http"
 	"regexp"
+
+	"github.com/kataras/iris/v12/context"
+	"github.com/kataras/iris/v12/core/router"
 )
 
 /*
@@ -13,48 +13,95 @@ Gán role vào route và path
 route = HTTP method + path
 roles là kết quả trả về từ hàm kiểu roleExp()
 */
-func assignRoles(method string, path string, roles pmodel.Roles) {
+func assignRoles(route Route) {
 	//Sử dụng regex để thay thế double slashes bằng single slash
 	re, _ := regexp.Compile("/+")
-	path = re.ReplaceAllLiteralString(path, "/")
+	route.Path = re.ReplaceAllLiteralString(route.Path, "/")
 
-	routesRoles[method+" "+path] = roles
+	routesRoles[route.Method+" "+route.Path] = route
 
-	if httpVerbRole := pathsRoles[path]; httpVerbRole == nil {
-		pathsRoles[path] = make(HTTPVerbRoles)
+	if _, ok := pathsRoles[route.Path]; !ok {
+		pathsRoles[route.Path] = route
 	}
-	pathsRoles[path][method] = roles
 }
 
-func Get(party router.Party, relativePath string, roleExp RoleExp, handlers ...context.Handler) {
-	party.Handle(http.MethodGet, relativePath, handlers...)
-	assignRoles(http.MethodGet, party.GetRelPath()+relativePath, roleExp())
+func Get(party router.Party, relativePath string, roleExp RoleExp, isPrivate bool, handlers ...context.Handler) {
+	roles, accessType := roleExp()
+	route := Route{
+		Path:       party.GetRelPath() + relativePath,
+		Method:     http.MethodGet,
+		IsPrivate:  isPrivate,
+		Roles:      roles,
+		AccessType: accessType,
+	}
+	party.Handle(route.Method, relativePath, handlers...)
+	assignRoles(route)
 }
 
-func Post(party router.Party, relativePath string, roleExp RoleExp, handlers ...context.Handler) {
-	party.Handle(http.MethodPost, relativePath, handlers...)
+func Post(party router.Party, relativePath string, roleExp RoleExp, isPrivate bool, handlers ...context.Handler) {
+	roles, accessType := roleExp()
+	route := Route{
+		Path:       party.GetRelPath() + relativePath,
+		Method:     http.MethodPost,
+		IsPrivate:  isPrivate,
+		Roles:      roles,
+		AccessType: accessType,
+	}
 
-	assignRoles(http.MethodPost, party.GetRelPath()+relativePath, roleExp())
+	party.Handle(route.Method, relativePath, handlers...)
+
+	assignRoles(route)
 }
 
-func Put(party router.Party, relativePath string, roleExp RoleExp, handlers ...context.Handler) {
-	party.Handle(http.MethodPut, relativePath, handlers...)
-	assignRoles(http.MethodPut, party.GetRelPath()+relativePath, roleExp())
+func Put(party router.Party, relativePath string, roleExp RoleExp, isPrivate bool, handlers ...context.Handler) {
+	roles, accessType := roleExp()
+	route := Route{
+		Path:       party.GetRelPath() + relativePath,
+		Method:     http.MethodPut,
+		IsPrivate:  isPrivate,
+		Roles:      roles,
+		AccessType: accessType,
+	}
+	party.Handle(route.Method, relativePath, handlers...)
+	assignRoles(route)
 }
 
-func Delete(party router.Party, relativePath string, roleExp RoleExp, handlers ...context.Handler) {
-	party.Handle(http.MethodDelete, relativePath, handlers...)
-	assignRoles(http.MethodDelete, party.GetRelPath()+relativePath, roleExp())
+func Delete(party router.Party, relativePath string, roleExp RoleExp, isPrivate bool, handlers ...context.Handler) {
+	roles, accessType := roleExp()
+	route := Route{
+		Path:       party.GetRelPath() + relativePath,
+		Method:     http.MethodDelete,
+		IsPrivate:  isPrivate,
+		Roles:      roles,
+		AccessType: accessType,
+	}
+	party.Handle(route.Method, relativePath, handlers...)
+	assignRoles(route)
 }
 
-func Patch(party router.Party, relativePath string, roleExp RoleExp, handlers ...context.Handler) {
-	party.Handle(http.MethodPatch, relativePath, handlers...)
-	assignRoles(http.MethodPatch, party.GetRelPath()+relativePath, roleExp())
+func Patch(party router.Party, relativePath string, roleExp RoleExp, isPrivate bool, handlers ...context.Handler) {
+	roles, accessType := roleExp()
+	route := Route{
+		Path:       party.GetRelPath() + relativePath,
+		Method:     http.MethodPatch,
+		Roles:      roles,
+		AccessType: accessType,
+	}
+	party.Handle(route.Method, relativePath, handlers...)
+	assignRoles(route)
 }
 
-func Any(party router.Party, relativePath string, roleExp RoleExp, handlers ...context.Handler) {
+func Any(party router.Party, relativePath string, roleExp RoleExp, isPrivate bool, handlers ...context.Handler) {
+	roles, accessType := roleExp()
+	route := Route{
+		Path:       party.GetRelPath() + relativePath,
+		IsPrivate:  isPrivate,
+		Roles:      roles,
+		AccessType: accessType,
+	}
 	party.Any(relativePath, handlers...)
 	for _, method := range router.AllMethods {
-		assignRoles(method, party.GetRelPath()+relativePath, roleExp())
+		route.Method = method
+		assignRoles(route)
 	}
 }

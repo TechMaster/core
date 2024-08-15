@@ -17,7 +17,6 @@ func ShowHomePage(ctx iris.Context) {
 	if authinfo != nil {
 		ctx.ViewData("roles", rbac.RolesNames(authinfo.Roles))
 	}
-
 	ctx.ViewData("users", repo.GetAll())
 	_ = ctx.View("index")
 }

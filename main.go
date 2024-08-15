@@ -2,8 +2,10 @@ package main
 
 import (
 	"github.com/TechMaster/core/config"
+	"github.com/TechMaster/core/controller"
 	"github.com/TechMaster/core/email"
 	"github.com/TechMaster/core/logger"
+	"github.com/TechMaster/core/pmodel"
 	"github.com/TechMaster/core/rbac"
 	"github.com/TechMaster/core/router"
 	"github.com/TechMaster/core/session"
@@ -36,6 +38,11 @@ func main() {
 
 	app.Use(session.Sess.Handler())
 
+	// Load các roles vào bộ nhớ
+	rbac.LoadRoles(func() []pmodel.Role {
+		return controller.Roles
+	})
+
 	rbacConfig := rbac.NewConfig()
 	rbacConfig.MakeUnassignedRoutePublic = true
 	rbac.Init(rbacConfig) //Khởi động với cấu hình mặc định
@@ -45,12 +52,17 @@ func main() {
 	router.RegisterRoute(app)
 
 	template.InitBlockEngine(app, "./views", "default")
-
 	logger.Log2(eris.SysError("Cuộc sống tốt đẹp. Hãy trận trọng và sống hết mình từng giây một"))
-
+	// Meger các route load từ database vào RBAC
+	rbac.LoadRules(func() []pmodel.Rule {
+		rules := make([]pmodel.Rule, 0)
+		for _, rule := range controller.RulesDb {
+			rules = append(rules, *rule)
+		}
+		return rules
+	})
 	//Luôn để hàm này sau tất cả lệnh cấu hình đường dẫn với RBAC
 	rbac.BuildPublicRoute(app)
-
 	//Khởi động email redis
 
 	asynClient := email.InitRedisMail()

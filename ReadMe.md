@@ -84,6 +84,11 @@ func main() {
 	defer redisDb.Close()
 	app.Use(session.Sess.Handler())
 
+	// Load các roles vào bộ nhớ
+	rbac.LoadRoles(func() []pmodel.Role {
+		return controller.Roles
+	})
+
 	rbacConfig := rbac.NewConfig()
 	rbacConfig.MakeUnassignedRoutePublic = true //mọi route không dùng rbac coi là public
 	rbac.Init(rbacConfig) //Khởi động với cấu hình mặc định
@@ -96,6 +101,15 @@ func main() {
 	router.RegisterRoute(app)  //Cấu hình đường dẫn đến các controller
 
 	template.InitViewEngine(app) //Khởi tạo View Template Engine
+
+	// Meger các route load từ database vào RBAC
+	rbac.LoadRules(func() []pmodel.Rule {
+		rules := make([]pmodel.Rule, 0)
+		for _, rule := range controller.RulesDb {
+			rules = append(rules, *rule)
+		}
+		return rules
+	})
 
 	//Luôn để hàm này sau tất cả lệnh cấu hình đường dẫn với RBAC
 	rbac.BuildPublicRoute(app)
@@ -302,65 +316,71 @@ func Logout(ctx iris.Context) error
 
 ## 6. Sử dụng RBAC
 Cần khởi tạo và cấu hình RBAC trong file main.go
-Sau đó trong router viết hàm đăng ký route + controller
-
-RBAC hỗ trợ 4 hàm:
+Sau đó trong router viết hàm đăng ký route + roleExp + isPrivate + controller
+- Nếu isPrivate = true, thì roleExp phải là `AllowOnlyAdmin()` khi đó chúng ta sẽ phân quyền trong database bảng rules
+- Nếu isPrivate = false thì roleExp là `AllowAll()`
+RBAC hỗ trợ 5 hàm:
 1. `Allow(rbac.RoleX, rbac.RoleY)`: cho phép RoleX và RoleY
 2. `AllowAll()`: cho phép tất cả các role
-3. `Forbid(rbac.RoleA, rbac.RoleB)`: cấm role RoleA, RoleB, các role khác đều được phép
-4. `ForbidAll()`: cấm tất cả các role
+3. `AllowOnlyAdmin()`:chỉ cho phép role `admin`
+4. `Forbid(rbac.RoleA, rbac.RoleB)`: cấm role RoleA, RoleB, các role khác đều được phép
+5. `ForbidAll()`: cấm tất cả các role
 
 Có thể chuyển app và hoặc đối tượng party vào tham số đầu tiên của rbac
 
 ```go
 func RegisterRoute(app *iris.Application) {
-
-	app.Get("/", controller.ShowHomePage) //Không dùng rbac có nghĩa là public method
-	app.Post("/login", controller.Login)
-	rbac.Get(app, "/logout", rbac.AllowAll(), controller.LogoutFromWeb)
+	// Tất cả route phải được viết qua rbac để kiểm soát
+	// Nếu không viết vào rbac nó sẽ là public cho tất cả được truy cập và sẽ không dynamic
+	rbac.Get(app, "/", rbac.AllowAll(), false, controller.ShowHomePage)
+	rbac.Post("/login", rbac.AllowAll(), false, controller.Login)
+	rbac.Get(app, "/logout", rbac.AllowAll(), true,controller.LogoutFromWeb)
 
 	blog := app.Party("/blog")
 	{
-		blog.Get("/", controller.GetAllPosts) //Không dùng rbac có nghĩa là public method
-		rbac.Get(blog, "/all", rbac.AllowAll(), controller.GetAllPosts)
-		rbac.Get(blog, "/create", rbac.Forbid(rbac.MAINTAINER), controller.GetAllPosts)
-		rbac.Get(blog, "/{id:int}", rbac.Allow(rbac.AUTHOR, rbac.EDITOR), controller.GetPostByID)
-		rbac.Get(blog, "/delete/{id:int}", rbac.Allow(rbac.ADMIN, rbac.AUTHOR, rbac.EDITOR), controller.DeletePostByID)
-		rbac.Any(blog, "/any", rbac.Allow(rbac.MAINTAINER), controller.PostMiddleware)
+		rbac.Get(blog, "/", rbac.AllowAll(), false, controller.GetAllPosts)
+		rbac.Get(blog, "/all", rbac.AllowAll(), true controller.GetAllPosts)
+		rbac.Get(blog, "/create", rbac.AllowOnlyAdmin(), true, controller.GetAllPosts)
+		rbac.Get(blog, "/{id:int}", rbac.AllowOnlyAdmin(), true,controller.GetPostByID)
+		rbac.Get(blog, "/delete/{id:int}", rbac.AllowOnlyAdmin(), true, controller.DeletePostByID)
+		rbac.Any(blog, "/any", rbac.AllowOnlyAdmin(), true, controller.PostMiddleware)
 	}
 
 	student := app.Party("/student")
 	{
-		rbac.Get(student, "/submithomework", rbac.Allow(rbac.STUDENT), controller.SubmitHomework)
+		rbac.Get(student, "/submithomework", rbac.AllowOnlyAdmin(), true, controller.SubmitHomework)
 	}
 
 	trainer := app.Party("/trainer")
 	{
-		rbac.Get(trainer, "/createlesson", rbac.Allow(rbac.TRAINER), controller.CreateLesson)
+		rbac.Get(trainer, "/createlesson", rbac.AllowOnlyAdmin(), true, controller.CreateLesson)
 	}
 
 	sysop := app.Party("/sysop")
 	{
-		rbac.Get(sysop, "/backupdb", rbac.Allow(rbac.SYSOP), controller.BackupDB)
-		rbac.Get(sysop, "/upload", rbac.Allow(rbac.MAINTAINER, rbac.SYSOP), controller.ShowUploadForm)
-		rbac.Post(sysop, "/upload", rbac.Allow(rbac.MAINTAINER, rbac.SYSOP, rbac.SALE), iris.LimitRequestBodySize(300000), controller.UploadPhoto)
+		rbac.Get(sysop, "/backupdb", rbac.AllowOnlyAdmin(), true, controller.BackupDB)
+		rbac.Get(sysop, "/upload", rbac.AllowOnlyAdmin(), true, controller.ShowUploadForm)
+		rbac.Post(sysop, "/upload", rbac.AllowOnlyAdmin(), true, iris.LimitRequestBodySize(300000), controller.UploadPhoto)
 	}
 }
 ```
-Mặc định đã có sẵn các role sau đây
+
+Sau đó sẽ gọi `rbac.LoadRules` để load tất cả các rules đã được phân quyền từ database
+```go
+
+rbac.LoadRules(func() []pmodel.Rule {
+	// Viết SQL lấy các rules từ database về
+	return rules
+})
+```
+
+Cuối cùng gọi hàm `BuildPublicRoute` để phân các route public
 
 ```go
-const (
-	ADMIN      = 1
-	STUDENT    = 2
-	TRAINER    = 3
-	SALE       = 4
-	EMPLOYER   = 5
-	AUTHOR     = 6
-	EDITOR     = 7 //edit bài, soạn page, làm công việc digital marketing
-	MAINTAINER = 8 //quản trị hệ thống, gánh bớt việc cho Admin, back up dữ liệu. Sửa đổi profile,role user, ngoại trừ role ROOT và Admin
-)
+//Luôn để hàm này sau tất cả lệnh cấu hình đường dẫn với RBAC
+rbac.BuildPublicRoute(app)
 ```
+
 ## 7. Cấu trúc dữ liệu trong pmodel
 
 pmodel là nơi định nghĩa cấu trúc dữ liệu phụ vụ việc đăng nhập, quản lý người dùng
@@ -391,6 +411,27 @@ func RolesToIntArr(roles Roles) []int
 Chuyển đổi kiểu intArray trong đó mỗi phần tử ứng với một role, sang kiểu map[int] bool
 ```go
 func IntArrToRoles(intArr []int) Roles
+```
+
+Cấu trúc chi tiết Rule xem ở đây [pmodel/rule.go](pmodel/rule.go)
+
+Danh sách các rules sẽ được lấy từ database
+
+```go
+/*
+Rule là cấu hình cho việc kiểm tra quyền truy cập
+- Nếu IsPrivate = true thì cần kiểm tra quyền và Roles, AccessType không có ý nghĩa, có thể để AccessType = "allow_all" cho dễ hiểu
+*/
+type Rule struct {
+	ID         int    //ID của rule
+	Name       string //Tên của rule
+	Roles      []int  `pg:",array"` //Danh sách các role có thể truy xuất
+	AccessType string //Allow, AllowAll, AllowOnlyAdmin, Forbid, ForbidAll
+	Method     string //GET, POST, PUT, DELETE, PATCH
+	Path       string //Đường dẫn
+	IsPrivate  bool   //true: cần kiểm tra quyền, false: không cần kiểm tra quyền
+	Services   string //Dịnh nghĩa các rule cho các service khác nhau
+}
 ```
 
 ## 8. Template Engine

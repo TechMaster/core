@@ -1,0 +1,31 @@
+<div>
+    <div>
+        <h2>Danh sách Rules</h2>
+    </div>
+    <ul style="margin-top: 12px">
+        {{ range .rules }}
+        <li style="padding: 4px 0">
+            {{ .ID }} ------ {{.Method}} ------ {{.Path}} ------ {{.Name}} ------
+            {{.Roles}} ------ {{.IsPrivate}} ------ {{.AccessType}}
+            <a style="margin-left: 4px;" href="/rules/{{.ID}}">
+                xem
+            </a>
+        </li>
+        {{ end }}
+    </ul>
+    <div>
+        <form action="/rules" method="POST">
+            <input type="text" name="Name" placeholder="Name" />
+            <input style="max-width: 100px;" type="text" name="Method" placeholder="Method" />
+            <input type="text" name="Path" placeholder="Path" />
+            <input type="text" name="Roles" placeholder="Roles" />
+            <select name="IsPrivate" id="">
+                <option hidden>IsPrivate</option>
+                <option value="true">true</option>
+                <option value="false">false</option>
+            </select>
+            <input type="text" name="AccessType" placeholder="AccessType" />
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</div>

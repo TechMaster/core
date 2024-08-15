@@ -18,8 +18,9 @@ nó quét được hết tất cả các public route
 func BuildPublicRoute(app *iris.Application) {
 	for _, route := range app.GetRoutes() {
 		paddingRoute := correctRoute(route.Name)
-		//Nếu không tìm thấy padddingRoute trong map những private route
-		if roles := routesRoles[paddingRoute]; roles == nil {
+
+		//Nếu IsPrivate = false thì đây là route public
+		if r, ok := routesRoles[paddingRoute]; ok && !r.IsPrivate {
 			publicRoutes[paddingRoute] = true
 		}
 	}
@@ -29,6 +30,8 @@ func BuildPublicRoute(app *iris.Application) {
 In ra danh sách những đường dẫn public không kiểm tra quyền
 */
 func DebugPublicRouteRole(app *iris.Application) {
+	fmt.Println("*** Public Routes ***")
+	fmt.Println("Total", "----", len(publicRoutes))
 	for route := range publicRoutes {
 		fmt.Println(route)
 	}
@@ -40,9 +43,9 @@ route = HTTP Verb + path
 */
 func DebugRouteRole() {
 	fmt.Println("*** Private Routes ***")
-	for route, roles := range routesRoles {
-		fmt.Println("-" + route)
-		for role, allow := range roles {
+	for path, route := range routesRoles {
+		fmt.Println("-" + path)
+		for role, allow := range route.Roles {
 			if allow.(bool) {
 				fmt.Println("      " + RoleName(role)) //allow role in trắng
 			} else {
@@ -59,18 +62,17 @@ Phần Private: những route cần kiểm tra quyền
 */
 func DebugPathRole() {
 	fmt.Println("*** Private Path ***")
-	for path, httpVerbRoles := range pathsRoles {
-		fmt.Println("-" + path)
-		for httpVerb, roles := range httpVerbRoles {
-			fmt.Println("  -" + httpVerb)
-			for role := range roles {
-				fmt.Println("     " + RoleName(role))
-			}
+	for path, route := range pathsRoles {
+		fmt.Println("-" + path + "-" + route.Method)
+		for role := range route.Roles {
+			fmt.Println("     " + RoleName(role))
 		}
 	}
 }
 
-/* Insert space between HTTP Verb and Path
+/*
+	Insert space between HTTP Verb and Path
+
 Input: GET/blog
 Output: GET /blog
 */
@@ -79,7 +81,7 @@ func correctRoute(route string) string {
 	return route[0:posFirstSlash] + " " + route[posFirstSlash:]
 }
 
-//Chuyển role từ in string
+// Chuyển role từ in string
 func RoleName(role int) string {
 	return roleName[role]
 }
@@ -92,4 +94,35 @@ func RolesNames(roles pmodel.Roles) (rolesNames []string) {
 		rolesNames = append(rolesNames, RoleName(role))
 	}
 	return
+}
+
+// Hàm chuyển đổi từ Rule sang Route
+func ConvertRules(rules []pmodel.Rule) {
+	for _, rule := range rules {
+		route := Route{
+			IsPrivate:  rule.IsPrivate,
+			Path:       rule.Path,
+			Method:     strings.ToUpper(rule.Method),
+			AccessType: rule.AccessType,
+		}
+		switch strings.ToLower(rule.AccessType) {
+		case ALLOW:
+			roles, _ := Allow(rule.Roles...)()
+			route.Roles = roles
+		case ALLOW_ALL:
+			roles, _ := AllowAll()()
+			route.Roles = roles
+		case FORBID:
+			roles, _ := Forbid(rule.Roles...)()
+			route.Roles = roles
+		case FORBID_ALL:
+			roles, _ := ForbidAll()()
+			route.Roles = roles
+		case ALLOW_ONLY_ADMIN:
+		default:
+			roles, _ := AllowOnlyAdmin()()
+			route.Roles = roles
+		}
+		routesRoles[route.Method+" "+route.Path] = route
+	}
 }

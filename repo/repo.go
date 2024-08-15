@@ -11,16 +11,16 @@ import (
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
-var users = make(map[string]*pmodel.User)
+var Users = make(map[string]*pmodel.User)
 
 func init() {
-	CreateNewUser("Admin", "1", "admin@gmail.com", "0123776000", rbac.ADMIN)
-	CreateNewUser("Bùi Văn Hiên", "1", "hien@gmail.com", "0123456789", rbac.TRAINER, rbac.MAINTAINER)
-	CreateNewUser("Nguyễn Hàn Duy", "1", "duy@gmail.com", "0123456786", rbac.TRAINER, rbac.STUDENT)
-	CreateNewUser("Phạm Thị Mẫn", "1", "man@gmail.com", "0123456780", rbac.SALE, rbac.STUDENT)
-	CreateNewUser("Trịnh Minh Cường", "1", "cuong@gmail.com", "0123456000", rbac.ADMIN, rbac.TRAINER)
-	CreateNewUser("Nguyễn Thành Long", "1", "long@gmail.com", "0123456001", rbac.STUDENT)
-	CreateNewUser("Dương Văn Thịnh", "1", "thinh@gmail.com", "0223456001", rbac.AUTHOR, rbac.EDITOR, rbac.EMPLOYER, rbac.STUDENT)
+	CreateNewUser("Admin", "1", "admin@gmail.com", "0123776000", 1)
+	CreateNewUser("Bùi Văn Hiên", "1", "hien@gmail.com", "0123456789", 3, 8)
+	CreateNewUser("Nguyễn Hàn Duy", "1", "duy@gmail.com", "0123456786", 3, 2)
+	CreateNewUser("Phạm Thị Mẫn", "1", "man@gmail.com", "0123456780", 4, 2)
+	CreateNewUser("Trịnh Minh Cường", "1", "cuong@gmail.com", "0123456000", 1, 3)
+	CreateNewUser("Nguyễn Thành Long", "1", "long@gmail.com", "0123456001", 2)
+	CreateNewUser("Dương Văn Thịnh", "1", "thinh@gmail.com", "0223456001", 6, 7, 5, 2)
 }
 
 func CreateNewUser(fullName string, password string, email string, phone string, roles ...int) {
@@ -35,10 +35,10 @@ func CreateNewUser(fullName string, password string, email string, phone string,
 		Roles:    roles,
 	}
 
-	users[user.Email] = &user //Thêm user vào users
+	Users[user.Email] = &user //Thêm user vào users
 }
 func QueryByEmail(email string) (user *pmodel.User, err error) {
-	user = users[strings.ToLower(email)]
+	user = Users[strings.ToLower(email)]
 	if user == nil {
 		return nil, errors.New("User not found")
 	} else {
@@ -52,7 +52,7 @@ Chưa có thì tạo mới: Insert
 Gọi tóm tắt là UpSert
 */
 func UpSertUser(user *pmodel.User) {
-	users[strings.ToLower(user.Email)] = user
+	Users[strings.ToLower(user.Email)] = user
 }
 
 type ViewUser struct {
@@ -63,8 +63,8 @@ type ViewUser struct {
 }
 
 func GetAll() []ViewUser {
-	result := make([]ViewUser, 0, len(users))
-	for _, user := range users {
+	result := make([]ViewUser, 0, len(Users))
+	for _, user := range Users {
 		rolesString := ""
 		for i, role := range user.Roles {
 			rolesString += fmt.Sprintf("%d:%s", role, rbac.RoleName(role))

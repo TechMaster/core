@@ -11,7 +11,7 @@ import (
 )
 
 /*
-	Lưu thông tin đăng nhập từ client gửi lên
+Lưu thông tin đăng nhập từ client gửi lên
 */
 type LoginRequest struct {
 	Email string
@@ -44,7 +44,7 @@ func Login(ctx iris.Context) {
 		UserId:       user.Id,
 		UserFullName: user.FullName,
 		UserEmail:    user.Email,
-		Roles:    pmodel.IntArrToRoles(user.Roles), //Chuyển từ mảng []int sang map[int]bool
+		Roles:        pmodel.IntArrToRoles(user.Roles), //Chuyển từ mảng []int sang map[int]bool
 	})
 
 	//Login thành công thì quay về trang chủ

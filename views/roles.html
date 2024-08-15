@@ -1,0 +1,20 @@
+<div>
+    <div>
+        <h2>Danh sách Role</h2>
+    </div>
+    <ul style="margin-top: 12px;">
+        {{ range .roles }}
+        <li>{{ .ID }} - {{.Name}}
+            <a onclick="return confirm('Bạn có chắc chắn xóa') " href="/roles/{{.ID}}">
+                &#10540
+            </a>
+        </li>
+        {{ end }}
+    </ul>
+    <div>
+        <form action="/roles" method="POST">
+            <input type="text" name="Name" placeholder="Role">
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</div>

@@ -12,21 +12,30 @@ import (
 func RegisterRoute(app *iris.Application) {
 	limiter := tollbooth.NewLimiter(1, nil) //Maxium 1 request per second
 
-	app.Get("/", controller.ShowHomePage)
+	rbac.Get(app, "/", rbac.AllowAll(), false, controller.ShowHomePage)
 
 	app.Get("/err", controller.ShowErr)
 
-	app.Post("/login", ratelimit.LimitHandler(limiter), controller.Login)
-	rbac.Get(app, "/secret", rbac.AllowAll(), controller.ShowSecret)
-	rbac.Get(app, "/logout", rbac.AllowAll(), controller.LogoutFromWeb)
+	rbac.Post(app, "/login", rbac.AllowAll(), false, ratelimit.LimitHandler(limiter), controller.Login)
+	rbac.Get(app, "/secret", rbac.AllowAll(), true, controller.ShowSecret)
+	rbac.Get(app, "/logout", rbac.AllowAll(), true, controller.LogoutFromWeb)
 
-	rbac.Get(app, "/changerole", rbac.Allow(rbac.ADMIN), controller.ShowChangeRoleForm)
-	rbac.Post(app, "/changerole", rbac.Allow(rbac.ADMIN), controller.ChangeRole)
+	rbac.Get(app, "/roles", rbac.AllowOnlyAdmin(), true, controller.GetAllRole)
+	rbac.Post(app, "/roles", rbac.AllowOnlyAdmin(), true, controller.AddRole)
+	rbac.Get(app, "/roles/{id}", rbac.AllowOnlyAdmin(), true, controller.DeleteRole)
+
+	rbac.Get(app, "/rules", rbac.AllowOnlyAdmin(), true, controller.GetAllRule)
+	rbac.Post(app, "/rules", rbac.AllowOnlyAdmin(), true, controller.AddRule)
+	rbac.Get(app, "/rules/{id}", rbac.AllowOnlyAdmin(), true, controller.ShowViewRuleEdit)
+	rbac.Post(app, "/rules/{id}", rbac.AllowOnlyAdmin(), true, controller.EditRule)
+
+	rbac.Get(app, "/changerole", rbac.AllowOnlyAdmin(), true, controller.ShowChangeRoleForm)
+	rbac.Post(app, "/changerole", rbac.AllowOnlyAdmin(), true, controller.ChangeRole)
 
 	api := app.Party("/api")
 	{
-		api.Post("/login", controller.LoginREST)
-		api.Get("/logout", controller.LogoutREST)
-		rbac.Get(api, "/books", rbac.Allow(rbac.STUDENT, rbac.TRAINER), controller.Books)
+		rbac.Post(api, "/login", rbac.AllowAll(), false, controller.LoginREST)
+		rbac.Get(api, "/logout", rbac.AllowAll(), false, controller.LogoutREST)
+		rbac.Get(api, "/books", rbac.AllowOnlyAdmin(), true, controller.Books)
 	}
 }

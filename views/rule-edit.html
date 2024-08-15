@@ -1,0 +1,20 @@
+<div>
+    <div>
+        <h2>Edit Rules {{.rule.ID}}</h2>
+    </div>
+    <div>
+        <form action="/rules/{{.rule.ID}}" method="POST">
+            <input type="text" name="Name" placeholder="Name" value="{{.rule.Name}}" />
+            <input style="max-width: 100px;" type="text" name="Method" placeholder="Method" value="{{.rule.Method}}" />
+            <input type="text" name="Path" placeholder="Path" value="{{.rule.Path}}" />
+            <input type="text" name="Roles" placeholder="Roles" value="{{.rule.Roles}}" />
+            <select name="IsPrivate" id="">
+                <option hidden>IsPrivate</option>
+                <option value="true" {{if .rule.IsPrivate}}selected{{end}}>true</option>
+                <option value="false" {{if not .rule.IsPrivate}}selected{{end}}>false</option>
+            </select>
+            <input type="text" name="AccessType" placeholder="AccessType" value="{{.rule.AccessType}}" />
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</div>

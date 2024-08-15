@@ -20,7 +20,6 @@ func CheckRoutePermission(ctx iris.Context) {
 		//Gán authinfo để cho handler phía sau dùng
 		ctx.ViewData(session.AUTHINFO, authinfo)
 	}
-
 	//Nếu route nằm trong public routes
 	if publicRoutes[route] {
 		// và cấu hình cho phép các route không nằm trong routesRoles
@@ -39,7 +38,11 @@ func CheckRoutePermission(ctx iris.Context) {
 		return
 	}
 
-	allowGoNext := checkUser_RouteRole_Intersect(authinfo.Roles, routesRoles[route])
+	// Kiểm tra xem user có role admin không
+	allowGoNext := checkAdmin(authinfo.Roles)
+	if !allowGoNext {
+		allowGoNext = checkUser_RouteRole_Intersect(authinfo.Roles, routesRoles[route].Roles)
+	}
 
 	if allowGoNext { //Được quyền đi tiếp
 		ctx.Next()
@@ -65,7 +68,6 @@ Nếu route không thuộc nhóm public routes cần kiểm tra phân quyền
 	C2: userrole không có trong rolesInRoute, mặc nhiên allowGoNext = false
 */
 func checkUser_RouteRole_Intersect(userRoles pmodel.Roles, rolesInRoute pmodel.Roles) (allowGoNext bool) {
-
 	allowGoNext = false
 	intersect := false //rolesInRoute và authinfo.Roles giao nhau ít nhất một role --> true
 
@@ -100,4 +102,14 @@ func checkUser_RouteRole_Intersect(userRoles pmodel.Roles, rolesInRoute pmodel.R
 		}
 	}
 	return allowGoNext
+}
+
+func checkAdmin(userRoles pmodel.Roles) bool {
+	idAdmin := Roles["admin"]
+	// Kiểm tra xem idAdmin có tồn tại trong userRoles hay không
+	if isAdmin, ok := userRoles[idAdmin].(bool); ok {
+		return isAdmin
+	}
+	// Trả về false nếu isAdmin không phải kiểu bool hoặc không tồn tại
+	return false
 }

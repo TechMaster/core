@@ -1,12 +1,13 @@
 package rbac
 
 import (
+	"regexp"
+
 	"github.com/casbin/casbin/v2"
 	redisadapter "github.com/casbin/redis-adapter/v3"
 	"github.com/gomodule/redigo/redis"
 	"github.com/kataras/iris/v12"
 	"github.com/spf13/viper"
-	"regexp"
 )
 
 /*
@@ -48,25 +49,13 @@ func AddOldRole(app *iris.Application, enforce *casbin.Enforcer) (err error) {
 	regxp := regexp.MustCompile(`:(([a-zA-Z_])*)`)
 
 	for _, route := range routes {
-		for i := range pathsRoles[regxp.ReplaceAllString(route.Path, "{$1}")][route.Method] {
+		for i := range pathsRoles[regxp.ReplaceAllString(route.Path, "{$1}")].Roles {
 			var role string
-			switch i {
-			case ADMIN:
-				role = "ADMIN"
-			case STUDENT:
-				role = "STUDENT"
-			case TRAINER:
-				role = "TRAINER"
-			case SALE:
-				role = "SALE"
-			case EMPLOYER:
-				role = "EMPLOYER"
-			case AUTHOR:
-				role = "AUTHOR"
-			case EDITOR:
-				role = "EDITOR"
-			case MAINTAINER:
-				role = "MAINTAINER"
+			for k, v := range Roles {
+				if v == i {
+					role = k
+					break
+				}
 			}
 			_, err = enforce.AddPolicy(role, viper.GetString("host")+route.Path, route.Method)
 			if err != nil {
