@@ -13,5 +13,5 @@ type Rule struct {
 	Method       string //GET, POST, PUT, DELETE, PATCH
 	Path         string //Đường dẫn
 	IsPrivate    bool   //true: cần kiểm tra quyền, false: không cần kiểm tra quyền
-	Services     string //Dịnh nghĩa các rule cho các service khác nhau
+	Service     string //Dịnh nghĩa các rule cho các service khác nhau
 }
