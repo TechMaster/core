@@ -113,3 +113,14 @@ func checkAdmin(userRoles pmodel.Roles) bool {
 	// Trả về false nếu isAdmin không phải kiểu bool hoặc không tồn tại
 	return false
 }
+
+// CheckSpecialRoles kiểm tra xem user có role đặc biệt không để custom logic controller
+
+func CheckSpecialRoles(userRoles pmodel.Roles, rolesSpecial pmodel.Roles) bool {
+	for role := range rolesSpecial {
+		if _, ok := userRoles[role]; ok {
+			return true
+		}
+	}
+	return false
+}
