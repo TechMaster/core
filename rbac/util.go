@@ -29,7 +29,7 @@ func BuildPublicRoute(app *iris.Application) {
 /*
 In ra danh sách những đường dẫn public không kiểm tra quyền
 */
-func DebugPublicRouteRole(app *iris.Application) {
+func DebugPublicRouteRole() {
 	fmt.Println("*** Public Routes ***")
 	fmt.Println("Total", "----", len(publicRoutes))
 	for route := range publicRoutes {
@@ -44,12 +44,12 @@ route = HTTP Verb + path
 func DebugRouteRole() {
 	fmt.Println("*** Private Routes ***")
 	for path, route := range routesRoles {
-		fmt.Println("-" + path)
+		fmt.Println("-"+path, "-", route.IsPrivate)
 		for role, allow := range route.Roles {
 			if allow.(bool) {
-				fmt.Println("      " + RoleName(role)) //allow role in trắng
+				fmt.Println("      " + RoleName(role) + "allow") //allow role in trắng
 			} else {
-				fmt.Println("     \033[31m^" + RoleName(role) + "\033[0m") //forbid role in đỏ
+				fmt.Println("     \033[31m^" + RoleName(role) + "\033[0m" + "forbid") //forbid role in đỏ
 			}
 		}
 	}
@@ -127,5 +127,8 @@ func ConvertRules(rules []pmodel.Rule) {
 		special, _ := Allow(rule.SpecialRoles...)()
 		routesRoles[route.Method+" "+route.Path] = route
 		SpecialRoles[route.Method+" "+route.Path] = special
+		if r, ok := routesRoles[route.Method+" "+route.Path]; ok && !r.IsPrivate {
+			publicRoutes[route.Method+" "+route.Path] = true
+		}
 	}
 }
