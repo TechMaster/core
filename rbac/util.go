@@ -127,8 +127,20 @@ func ConvertRules(rules []pmodel.Rule) {
 		special, _ := Allow(rule.SpecialRoles...)()
 		routesRoles[route.Method+" "+route.Path] = route
 		SpecialRoles[route.Method+" "+route.Path] = special
-		if r, ok := routesRoles[route.Method+" "+route.Path]; ok && !r.IsPrivate {
-			publicRoutes[route.Method+" "+route.Path] = true
+	}
+}
+
+/*
+	Load lại các rules public, dùng khi có thay đổi về rules từ database
+*/
+
+func ReloadPublicRoute() {
+	for path, route := range routesRoles {
+		if _, ok := publicRoutes[path]; ok && route.IsPrivate {
+			delete(publicRoutes, path)
+		}
+		if !route.IsPrivate {
+			publicRoutes[path] = true
 		}
 	}
 }
