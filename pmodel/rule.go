@@ -8,7 +8,6 @@ type Rule struct {
 	ID           int    //ID của rule
 	Name         string //Tên của rule
 	Roles        []int  `pg:",array"` //Danh sách các role có thể truy xuất
-	SpecialRoles []int  `pg:",array"` //Danh sách các role đặc biệt xử lý cấp controller
 	AccessType   string //Allow, AllowAll, AllowOnlyAdmin, Forbid, ForbidAll
 	Method       string //GET, POST, PUT, DELETE, PATCH
 	Path         string //Đường dẫn

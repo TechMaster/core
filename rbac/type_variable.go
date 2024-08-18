@@ -27,10 +27,6 @@ Biểu thức hàm sẽ trả về
 */
 type RoleExp func() (pmodel.Roles, string)
 
-// SpecialRoles là danh sách các role đặc biệt
-
-var SpecialRoles = make(map[string]pmodel.Roles)
-
 /*
 Ứng với một route = HTTP Verb + Path chúng ta có một map các role
 Dùng để kiểm tra phân quyền
@@ -69,6 +65,11 @@ type Config struct {
 	mặc định là false
 	*/
 	MakeUnassignedRoutePublic bool
+
+	/*
+		Service chỉ định tên của service đăng ký trong rules
+	*/
+	Service string
 }
 
 // Lưu cấu hình cho package RBAC
@@ -80,6 +81,5 @@ type Route struct {
 	Method       string
 	IsPrivate    bool
 	Roles        pmodel.Roles
-	SpecialRoles pmodel.Roles
 	AccessType   string
 }

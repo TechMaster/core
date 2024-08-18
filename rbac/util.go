@@ -124,9 +124,7 @@ func ConvertRules(rules []pmodel.Rule) {
 			roles, _ := AllowOnlyAdmin()()
 			route.Roles = roles
 		}
-		special, _ := Allow(rule.SpecialRoles...)()
 		routesRoles[route.Method+" "+route.Path] = route
-		SpecialRoles[route.Method+" "+route.Path] = special
 	}
 }
 
@@ -143,4 +141,34 @@ func ReloadPublicRoute() {
 			publicRoutes[path] = true
 		}
 	}
+}
+
+/*
+	Hàm tự động insert các rules vào database
+	@param funcInsert: hàm insert rules vào database
+*/
+
+func AutoRegisterRules(funcInsert func(rules []pmodel.Rule)) {
+	rules := []pmodel.Rule{}
+	for _, route := range routesRoles {
+		rule := pmodel.Rule{
+			Path:       route.Path,
+			Method:     route.Method,
+			AccessType: route.AccessType,
+			IsPrivate:  route.IsPrivate,
+			Service:    config.Service,
+		}
+		rules = append(rules, rule)
+	}
+	funcInsert(rules)
+}
+
+func AutoRegisterRoles(funcInsert func(roles []pmodel.Role), rolesDefault []string) {
+	roles := []pmodel.Role{}
+	for _, role := range rolesDefault {
+		roles = append(roles, pmodel.Role{
+			Name: strings.ToLower(role),
+		})
+	}
+	funcInsert(roles)
 }
