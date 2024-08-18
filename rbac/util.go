@@ -117,14 +117,15 @@ func ConvertRules(rules []pmodel.Rule) {
 			roles, _ := Forbid(rule.Roles...)()
 			route.Roles = roles
 		case FORBID_ALL:
+		default:
 			roles, _ := ForbidAll()()
 			route.Roles = roles
-		case ALLOW_ONLY_ADMIN:
-		default:
-			roles, _ := AllowOnlyAdmin()()
-			route.Roles = roles
 		}
-		routesRoles[route.Method+" "+route.Path] = route
+		if _, ok := routesRoles[route.Method+" "+route.Path]; ok {
+			routesRoles[route.Method+" "+route.Path] = route
+		} else {
+			rulesDelete[route.Path] = true
+		}
 	}
 }
 
@@ -144,14 +145,15 @@ func ReloadPublicRoute() {
 }
 
 /*
-	Hàm tự động insert các rules vào database
-	@param funcInsert: hàm insert rules vào database
+Hàm tự động insert các rules vào database
+@param handleInsert: hàm insert rules vào database
+@param handleDelete: hàm xóa rules khỏi database
 */
-
-func AutoRegisterRules(funcInsert func(rules []pmodel.Rule)) {
-	rules := []pmodel.Rule{}
+func RegisterRules(handleInsert func(rules []Rule), handleDelete ...func(rules []string)) {
+	rules := []Rule{}
 	for _, route := range routesRoles {
-		rule := pmodel.Rule{
+		rule := Rule{
+			Name:       "",
 			Path:       route.Path,
 			Method:     route.Method,
 			AccessType: route.AccessType,
@@ -160,10 +162,22 @@ func AutoRegisterRules(funcInsert func(rules []pmodel.Rule)) {
 		}
 		rules = append(rules, rule)
 	}
-	funcInsert(rules)
+	handleInsert(rules)
+	if handleDelete[0] != nil {
+		deleteRules := []string{}
+		for path := range rulesDelete {
+			deleteRules = append(deleteRules, path)
+		}
+		handleDelete[0](deleteRules)
+	}
 }
 
-func AutoRegisterRoles(funcInsert func(roles []pmodel.Role), rolesDefault []string) {
+/*
+Hàm tự động insert các roles vào database
+@param funcInsert: hàm insert roles vào database
+@param rolesDefault: danh sách các roles mặc định
+*/
+func RegisterRoles(funcInsert func(roles []pmodel.Role), rolesDefault []string) {
 	roles := []pmodel.Role{}
 	for _, role := range rolesDefault {
 		roles = append(roles, pmodel.Role{

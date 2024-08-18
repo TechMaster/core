@@ -38,8 +38,11 @@ Load các roles vào bộ nhớ
 func LoadRoles(fLoad func() []pmodel.Role, rolesRequire ...map[string]bool) {
 	roles := fLoad()
 	// Tạo một bản sao của rolesRequire để theo dõi các roles chưa được tìm thấy
-	missingRoles := map[string]bool{
-		"admin": true,
+	missingRoles := make(map[string]bool)
+	if config.HighestRole != "" {
+		missingRoles[config.HighestRole] = true
+	} else {
+		missingRoles[DEFAULT_HIGHEST_ROLE] = true
 	}
 	if len(rolesRequire) > 0 {
 		for k, v := range rolesRequire[0] {

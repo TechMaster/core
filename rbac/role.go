@@ -26,13 +26,6 @@ func AllowAll() RoleExp {
 	}
 }
 
-func AllowOnlyAdmin() RoleExp {
-	return func() (pmodel.Roles, string) {
-		mapRoles := make(pmodel.Roles)
-		mapRoles[Roles["admin"]] = true
-		return mapRoles, ALLOW_ONLY_ADMIN
-	}
-}
 
 // Danh sách các role bị cấm truy cập
 func Forbid(roles ...int) RoleExp {

@@ -20,22 +20,22 @@ func RegisterRoute(app *iris.Application) {
 	rbac.Get(app, "/secret", rbac.AllowAll(), true, controller.ShowSecret)
 	rbac.Get(app, "/logout", rbac.AllowAll(), true, controller.LogoutFromWeb)
 
-	rbac.Get(app, "/roles", rbac.AllowOnlyAdmin(), true, controller.GetAllRole)
-	rbac.Post(app, "/roles", rbac.AllowOnlyAdmin(), true, controller.AddRole)
-	rbac.Get(app, "/roles/{id}", rbac.AllowOnlyAdmin(), true, controller.DeleteRole)
+	rbac.Get(app, "/roles", rbac.ForbidAll(), true, controller.GetAllRole)
+	rbac.Post(app, "/roles", rbac.ForbidAll(), true, controller.AddRole)
+	rbac.Get(app, "/roles/{id}", rbac.ForbidAll(), true, controller.DeleteRole)
 
-	rbac.Get(app, "/rules", rbac.AllowOnlyAdmin(), true, controller.GetAllRule)
-	rbac.Post(app, "/rules", rbac.AllowOnlyAdmin(), true, controller.AddRule)
-	rbac.Get(app, "/rules/{id}", rbac.AllowOnlyAdmin(), true, controller.ShowViewRuleEdit)
-	rbac.Post(app, "/rules/{id}", rbac.AllowOnlyAdmin(), true, controller.EditRule)
+	rbac.Get(app, "/rules", rbac.ForbidAll(), true, controller.GetAllRule)
+	rbac.Post(app, "/rules", rbac.ForbidAll(), true, controller.AddRule)
+	rbac.Get(app, "/rules/{id}", rbac.ForbidAll(), true, controller.ShowViewRuleEdit)
+	rbac.Post(app, "/rules/{id}", rbac.ForbidAll(), true, controller.EditRule)
 
-	rbac.Get(app, "/changerole", rbac.AllowOnlyAdmin(), true, controller.ShowChangeRoleForm)
-	rbac.Post(app, "/changerole", rbac.AllowOnlyAdmin(), true, controller.ChangeRole)
+	rbac.Get(app, "/changerole", rbac.ForbidAll(), true, controller.ShowChangeRoleForm)
+	rbac.Post(app, "/changerole", rbac.ForbidAll(), true, controller.ChangeRole)
 
 	api := app.Party("/api")
 	{
 		rbac.Post(api, "/login", rbac.AllowAll(), false, controller.LoginREST)
 		rbac.Get(api, "/logout", rbac.AllowAll(), false, controller.LogoutREST)
-		rbac.Get(api, "/books", rbac.AllowOnlyAdmin(), true, controller.Books)
+		rbac.Get(api, "/books", rbac.ForbidAll(), true, controller.Books)
 	}
 }

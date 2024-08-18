@@ -5,11 +5,11 @@ import (
 )
 
 const (
-	ALLOW            = "allow"
-	FORBID           = "forbid"
-	ALLOW_ALL        = "allow_all"
-	FORBID_ALL       = "forbid_all"
-	ALLOW_ONLY_ADMIN = "allow_only_admin"
+	ALLOW      = "allow"
+	FORBID     = "forbid"
+	ALLOW_ALL  = "allow_all"
+	FORBID_ALL = "forbid_all"
+	DEFAULT_HIGHEST_ROLE = "admin"
 )
 
 // Dùng để in role kiểu int ra string cho dễ hiếu
@@ -26,6 +26,8 @@ Biểu thức hàm sẽ trả về
     Nếu forbid thì giá trị map[int]bool đều là false
 */
 type RoleExp func() (pmodel.Roles, string)
+
+var rulesDelete = make(map[string]bool)
 
 /*
 Ứng với một route = HTTP Verb + Path chúng ta có một map các role
@@ -70,6 +72,11 @@ type Config struct {
 		Service chỉ định tên của service đăng ký trong rules
 	*/
 	Service string
+
+	/*
+		Vai trò cao nhất trong hệ thống
+	*/
+	HighestRole string
 }
 
 // Lưu cấu hình cho package RBAC
@@ -77,9 +84,22 @@ var config Config
 
 // Cấu trúc dùng để lưu thông tin của một route
 type Route struct {
-	Path         string
-	Method       string
-	IsPrivate    bool
-	Roles        pmodel.Roles
-	AccessType   string
+	Path       string
+	Method     string
+	IsPrivate  bool
+	Roles      pmodel.Roles
+	AccessType string
+}
+
+/*
+	Cấu trúc dùng để lưu thông tin của một rule
+*/
+
+type Rule struct {
+	Path       string
+	Method     string
+	IsPrivate  bool
+	Name       string
+	AccessType string
+	Service    string
 }

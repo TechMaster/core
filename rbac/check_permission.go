@@ -105,7 +105,12 @@ func checkUser_RouteRole_Intersect(userRoles pmodel.Roles, rolesInRoute pmodel.R
 }
 
 func checkAdmin(userRoles pmodel.Roles) bool {
-	idAdmin := Roles["admin"]
+	var idAdmin int
+	if config.HighestRole != "" {
+		idAdmin = Roles[config.HighestRole]
+	} else {
+		idAdmin = Roles[DEFAULT_HIGHEST_ROLE]
+	}
 	// Kiểm tra xem idAdmin có tồn tại trong userRoles hay không
 	if isAdmin, ok := userRoles[idAdmin].(bool); ok {
 		return isAdmin

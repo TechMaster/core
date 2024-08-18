@@ -355,18 +355,6 @@ func TestAllowAll(t *testing.T) {
 	}
 }
 
-func TestAllowOnlyAdmin(t *testing.T) {
-	// Assuming Roles is a map with an "admin" role
-	expectedRoles := pmodel.Roles{1: true}
-	expectedType := "allow_only_admin"
-
-	roleExp := AllowOnlyAdmin()
-	actualRoles, actualType := roleExp()
-
-	assert.Equal(t, expectedRoles, actualRoles, "Roles should match expected roles")
-	assert.Equal(t, expectedType, actualType, "Type should be 'allow_only_admin'")
-}
-
 func TestForbid(t *testing.T) {
 	roles := []int{1, 2, 3}
 	expectedRoles := pmodel.Roles{1: false, 2: false, 3: false}
