@@ -77,6 +77,13 @@ func LoadRoles(fLoad func() []pmodel.Role, rolesRequire ...map[string]bool) {
 
 // Hàm này sẽ được gọi sau khi đã đăng ký tất cả các route
 
-func LoadRules(fLoad func() []pmodel.Rule) {
+func LoadRules(fLoad func() []pmodel.Rule, handleDelete ...func(rules []string)) {
 	ConvertRules(fLoad())
+	if len(handleDelete) > 0 && handleDelete[0] != nil {
+		deleteRules := []string{}
+		for path := range rulesDelete {
+			deleteRules = append(deleteRules, path)
+		}
+		handleDelete[0](deleteRules)
+	}
 }

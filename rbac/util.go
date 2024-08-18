@@ -149,7 +149,7 @@ Hàm tự động insert các rules vào database
 @param handleInsert: hàm insert rules vào database
 @param handleDelete: hàm xóa rules khỏi database
 */
-func RegisterRules(handleInsert func(rules []Rule), handleDelete ...func(rules []string)) {
+func RegisterRules(handleInsert func(rules []Rule)) {
 	rules := []Rule{}
 	for _, route := range routesRoles {
 		rule := Rule{
@@ -163,13 +163,6 @@ func RegisterRules(handleInsert func(rules []Rule), handleDelete ...func(rules [
 		rules = append(rules, rule)
 	}
 	handleInsert(rules)
-	if handleDelete[0] != nil {
-		deleteRules := []string{}
-		for path := range rulesDelete {
-			deleteRules = append(deleteRules, path)
-		}
-		handleDelete[0](deleteRules)
-	}
 }
 
 /*
