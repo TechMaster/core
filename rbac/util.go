@@ -124,7 +124,7 @@ func ConvertRules(rules []pmodel.Rule) {
 		if _, ok := routesRoles[route.Method+" "+route.Path]; ok {
 			routesRoles[route.Method+" "+route.Path] = route
 		} else {
-			rulesDelete[route.Path] = true
+			rulesDelete[route.Method+" "+route.Path] = true
 		}
 	}
 }
@@ -178,4 +178,9 @@ func RegisterRoles(funcInsert func(roles []pmodel.Role), rolesDefault []string) 
 		})
 	}
 	funcInsert(roles)
+}
+
+func SeparationPathAndMethod(path string) (string, string) {
+	posFirstSpace := strings.Index(path, " ")
+	return path[0:posFirstSpace], path[posFirstSpace+1:]
 }
