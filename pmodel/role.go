@@ -35,6 +35,6 @@ func IntArrToRoles(intArr []int) Roles {
 Role là cấu hình cho việc kiểm tra quyền truy cập
 */
 type Role struct {
-	ID   int
-	Name string // Tên của role | lowercase
+	ID   int    `json:"id"`
+	Name string `json:"name"` // Tên của role | lowercase
 }

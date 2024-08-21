@@ -17,7 +17,6 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.1
 	github.com/hibiken/asynq v0.23.0
 	github.com/iris-contrib/middleware/cors v0.0.0-20220722121102-69215b87ab0b
-	github.com/kataras/blocks v0.0.6
 	github.com/kataras/golog v0.1.7
 	github.com/kataras/iris/v12 v12.2.0-beta4
 	github.com/matoous/go-nanoid/v2 v2.0.0
@@ -57,6 +56,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
+	github.com/kataras/blocks v0.0.6 // indirect
 	github.com/kataras/pio v0.0.10 // indirect
 	github.com/kataras/sitemap v0.0.5 // indirect
 	github.com/kataras/tunnel v0.0.4 // indirect
