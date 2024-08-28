@@ -317,14 +317,11 @@ func Logout(ctx iris.Context) error
 ## 6. Sử dụng RBAC
 Cần khởi tạo và cấu hình RBAC trong file main.go
 Sau đó trong router viết hàm đăng ký route + roleExp + isPrivate + controller
-- Nếu isPrivate = true, thì roleExp phải là `AllowOnlyAdmin()` khi đó chúng ta sẽ phân quyền trong database bảng rules
-- Nếu isPrivate = false thì roleExp là `AllowAll()`
 RBAC hỗ trợ 5 hàm:
 1. `Allow(rbac.RoleX, rbac.RoleY)`: cho phép RoleX và RoleY
 2. `AllowAll()`: cho phép tất cả các role
-3. `AllowOnlyAdmin()`:chỉ cho phép role `admin`
 4. `Forbid(rbac.RoleA, rbac.RoleB)`: cấm role RoleA, RoleB, các role khác đều được phép
-5. `ForbidAll()`: cấm tất cả các role
+5. `ForbidAll()`: cấm tất cả các role trừ admin
 
 Có thể chuyển app và hoặc đối tượng party vào tham số đầu tiên của rbac
 
@@ -340,27 +337,27 @@ func RegisterRoute(app *iris.Application) {
 	{
 		rbac.Get(blog, "/", rbac.AllowAll(), false, controller.GetAllPosts)
 		rbac.Get(blog, "/all", rbac.AllowAll(), true controller.GetAllPosts)
-		rbac.Get(blog, "/create", rbac.AllowOnlyAdmin(), true, controller.GetAllPosts)
-		rbac.Get(blog, "/{id:int}", rbac.AllowOnlyAdmin(), true,controller.GetPostByID)
-		rbac.Get(blog, "/delete/{id:int}", rbac.AllowOnlyAdmin(), true, controller.DeletePostByID)
-		rbac.Any(blog, "/any", rbac.AllowOnlyAdmin(), true, controller.PostMiddleware)
+		rbac.Get(blog, "/create", rbac.ForbidAll(), true, controller.GetAllPosts)
+		rbac.Get(blog, "/{id:int}", rbac.ForbidAll(), true,controller.GetPostByID)
+		rbac.Get(blog, "/delete/{id:int}", rbac.ForbidAll(), true, controller.DeletePostByID)
+		rbac.Any(blog, "/any", rbac.ForbidAll(), true, controller.PostMiddleware)
 	}
 
 	student := app.Party("/student")
 	{
-		rbac.Get(student, "/submithomework", rbac.AllowOnlyAdmin(), true, controller.SubmitHomework)
+		rbac.Get(student, "/submithomework", rbac.ForbidAll(), true, controller.SubmitHomework)
 	}
 
 	trainer := app.Party("/trainer")
 	{
-		rbac.Get(trainer, "/createlesson", rbac.AllowOnlyAdmin(), true, controller.CreateLesson)
+		rbac.Get(trainer, "/createlesson", rbac.ForbidAll(), true, controller.CreateLesson)
 	}
 
 	sysop := app.Party("/sysop")
 	{
-		rbac.Get(sysop, "/backupdb", rbac.AllowOnlyAdmin(), true, controller.BackupDB)
-		rbac.Get(sysop, "/upload", rbac.AllowOnlyAdmin(), true, controller.ShowUploadForm)
-		rbac.Post(sysop, "/upload", rbac.AllowOnlyAdmin(), true, iris.LimitRequestBodySize(300000), controller.UploadPhoto)
+		rbac.Get(sysop, "/backupdb", rbac.ForbidAll(), true, controller.BackupDB)
+		rbac.Get(sysop, "/upload", rbac.ForbidAll(), true, controller.ShowUploadForm)
+		rbac.Post(sysop, "/upload", rbac.ForbidAll(), true, iris.LimitRequestBodySize(300000), controller.UploadPhoto)
 	}
 }
 ```
@@ -426,7 +423,7 @@ type Rule struct {
 	ID         int    //ID của rule
 	Name       string //Tên của rule
 	Roles      []int  `pg:",array"` //Danh sách các role có thể truy xuất
-	AccessType string //Allow, AllowAll, AllowOnlyAdmin, Forbid, ForbidAll
+	AccessType string //Allow, AllowAll, ForbidAll, Forbid, ForbidAll
 	Method     string //GET, POST, PUT, DELETE, PATCH
 	Path       string //Đường dẫn
 	IsPrivate  bool   //true: cần kiểm tra quyền, false: không cần kiểm tra quyền

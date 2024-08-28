@@ -1,5 +1,13 @@
 # Những thay đổi
 
+## 0.1.82: 29/8/2024
+
+Chỉnh sửa, nâng cấp RBAC (Role Base Access Control)
+- Nâng cấp cho các roles dynamic 
+- Cấp quyền truy cập vào route
+- Tự động load các roles, rules
+- Tự động insert các rules và delete (Nếu không tồn tại các rule đó sẽ xóa trong db)
+
 ## 0.1.51: 1/4/2022
 - Thay đổi cách log error ra console, thống nhất trả ra kiểu text đối với content-type application/json thay vì lúc json, lúc text. File thay đổi [ở đây](../logger/log_error.go)
 - Import module eris mới nhất
